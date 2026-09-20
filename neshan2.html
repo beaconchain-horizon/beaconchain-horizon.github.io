@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Horizon Map v2</title>
+<link rel="stylesheet" href="https://static.neshan.org/sdk/maplibre/5.24.3/neshan-maplibre-sdk.css" />
+<script src="https://static.neshan.org/sdk/maplibre/5.24.3/neshan-maplibre-sdk.umd.js"></script>
+<style>
+html,body{margin:0;height:100%;font-family:Tahoma;background:#0a1628;color:#fff}
+#map{position:absolute;inset:0;z-index:1}
+#dbg{position:absolute;top:0;left:0;right:0;background:#000e;color:#0f0;padding:8px 12px;font-family:monospace;font-size:11px;z-index:9999;direction:ltr;text-align:left;white-space:pre-wrap;max-height:30vh;overflow:auto;border-bottom:2px solid #0f0}
+.err{color:#f00}
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="dbg"></div>
+<script>
+var D = document.getElementById('dbg');
+function log(m,c){var e=document.createElement('div');if(c)e.className=c;e.textContent='['+(new Date().getTime()%100000)+'] '+m;D.appendChild(e);}
+window.addEventListener('error',function(ev){log('ERR: '+ev.message+' @ '+ev.lineno,'err');});
+try{
+  log('version: V2-2030');
+  var maplibregl = window.maplibregl.default;
+  log('maplibregl OK');
+  var map = new maplibregl.Map({
+    container:'map',
+    style:'https://static.neshan.org/sdk/maplibre/styles/light.json',
+    center:[54.0,32.0],
+    zoom:5,
+    apiKey:'REDACTED_NESHAN_KEY'
+  });
+  log('Map created');
+  map.addControl(new maplibregl.NavigationControl(),'top-right');
+  map.addControl(new maplibregl.ScaleControl(),'bottom-left');
+  map.on('error',function(e){log('MAP ERR: '+(e&&e.error?e.error.message:JSON.stringify(e)),'err');});
+  map.on('load',function(){
+    log('*** LOADED ***');
+    try{
+      var DATA={gas:[{n:'IGAT-1',c:[[46.29,38.08],[48.67,31.32],[51.42,35.70]]},{n:'IGAT-5',c:[[59.60,36.29],[51.42,35.70]]}],
+                power:[{n:'Teh-Esf',c:[[51.42,35.70],[51.66,32.65]]},{n:'Teh-Mash',c:[[51.42,35.70],[59.60,36.29]]}],
+                oil:[{n:'Abadan',c:[48.29,30.34]},{n:'Isfahan',c:[51.66,32.65]}],
+                bank:[{n:'Markazi',c:[51.42,35.70]},{n:'Melli',c:[59.60,36.29]}]};
+      DATA.gas.forEach(function(it){
+        var id='g'+Math.random().toString(36).slice(2,7);
+        map.addSource(id,{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:it.c}}});
+        map.addLayer({id:id,type:'line',source:id,paint:{'line-color':'#ff6b6b','line-width':3}});
+      });
+      log('gas lines added');
+      DATA.power.forEach(function(it){
+        var id='p'+Math.random().toString(36).slice(2,7);
+        map.addSource(id,{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:it.c}}});
+        map.addLayer({id:id,type:'line',source:id,paint:{'line-color':'#facc15','line-width':2.5,'line-dasharray':[2,2]}});
+      });
+      log('power lines added');
+      DATA.oil.forEach(function(it){
+        var el=document.createElement('div');
+        el.style.cssText='width:16px;height:16px;background:#c084fc;border:2px solid #fff;border-radius:50%;box-shadow:0 0 12px #c084fc';
+        new maplibregl.Marker({element:el}).setLngLat(it.c).addTo(map);
+      });
+      log('oil markers added');
+      DATA.bank.forEach(function(it){
+        var el=document.createElement('div');
+        el.style.cssText='width:14px;height:14px;background:#4ade80;border:2px solid #fff;border-radius:50%;box-shadow:0 0 12px #4ade80';
+        new maplibregl.Marker({element:el}).setLngLat(it.c).addTo(map);
+      });
+      log('bank markers added');
+      log('*** ALL DONE ***','');
+    }catch(e){log('LOAD CB ERR: '+e.message,'err');}
+  });
+}catch(e){log('TOP ERR: '+e.message,'err');}
+</script>
+</body>
+</html>
