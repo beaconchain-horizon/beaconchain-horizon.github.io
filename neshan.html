@@ -1,1 +1,445 @@
-... (the whole file)
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizon Map | نقشه زیرساخت ایران</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Tahoma;background:#0a1628;color:#fff;height:100vh;overflow:hidden}
+#map{position:absolute;inset:0;z-index:1}
+#side{position:absolute;top:0;right:0;bottom:0;width:310px;background:rgba(10,22,40,.97);border-left:1px solid rgba(79,158,255,.3);z-index:100;overflow-y:auto;padding:15px}
+#side h1{font-size:1.05rem;color:#4f9eff;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid rgba(79,158,255,.3)}
+.cat{margin-bottom:10px;border-radius:10px;overflow:hidden;background:rgba(30,45,70,.5)}
+.cat-h{padding:12px 15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700;color:#c084fc;transition:.2s;font-size:.9rem}
+.cat-h:hover{background:rgba(79,158,255,.15)}
+.cat-h .arrow{transition:.3s;font-size:.7rem}
+.cat.open .cat-h .arrow{transform:rotate(-90deg)}
+.cat-body{display:none;padding:8px}
+.cat.open .cat-body{display:block}
+.sub{padding:8px 12px;margin:4px 0;border-radius:6px;cursor:pointer;font-size:.78rem;color:#cbd5e1;background:rgba(20,32,55,.7);border-right:3px solid transparent;transition:.2s}
+.sub:hover{background:rgba(79,158,255,.2);color:#fff}
+.sub.active{background:linear-gradient(90deg,rgba(79,158,255,.3),transparent);border-right-color:#4f9eff;color:#fff;font-weight:700}
+.sub .cnt{float:left;background:rgba(79,158,255,.3);padding:1px 7px;border-radius:10px;font-size:.65rem;color:#4f9eff;font-family:monospace}
+.all-btn{width:100%;padding:10px;margin-bottom:15px;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-family:Tahoma;font-size:.85rem}
+.all-btn:hover{opacity:.9}
+.stats{position:absolute;bottom:15px;left:15px;background:rgba(10,22,40,.97);padding:15px 18px;border-radius:12px;border:1px solid rgba(79,158,255,.4);z-index:100;font-size:.78rem;direction:rtl}
+.stats h3{color:#4f9eff;margin-bottom:8px;font-size:.88rem}
+.stats .row{margin:5px 0;color:#8fa2dc}
+.stats .row b{color:#4ade80;font-family:monospace;margin-right:6px;font-size:.95rem}
+.maplibregl-popup-content{background:rgba(10,22,40,.98)!important;color:#fff!important;border:1px solid #4f9eff;border-radius:10px;padding:15px!important;font-family:Tahoma;direction:rtl;max-width:290px}
+.maplibregl-popup-content h4{margin:0 0 8px;color:#4f9eff;font-size:.95rem;border-bottom:1px solid rgba(79,158,255,.3);padding-bottom:6px}
+.maplibregl-popup-content ul{margin:5px 18px 0 0;padding:0;font-size:.75rem;color:#cbd5e1;line-height:1.8}
+.maplibregl-popup-tip{border-top-color:rgba(10,22,40,.98)!important;border-bottom-color:rgba(10,22,40,.98)!important}
+.legend-tip{position:absolute;top:15px;left:15px;background:rgba(10,22,40,.95);padding:10px 15px;border-radius:10px;border:1px solid rgba(79,158,255,.4);color:#8fa2dc;font-size:.75rem;z-index:99}
+@media(max-width:700px){#side{width:250px}}
+</style>
+<link rel="stylesheet" href="https://static.neshan.org/sdk/maplibre/5.24.3/neshan-maplibre-sdk.css" />
+<script src="https://static.neshan.org/sdk/maplibre/5.24.3/neshan-maplibre-sdk.umd.js"></script>
+</head>
+<body>
+
+<div id="map"></div>
+<div id="side">
+  <h1>🗺️ نقشه زیرساخت ایران</h1>
+  <button class="all-btn" id="showAll">نمایش همه صنایع</button>
+  <div id="cats"></div>
+</div>
+<div class="legend-tip">روی هر گزینه کلیک کن تا فقط همون روی نقشه بیاد</div>
+<div class="stats">
+  <h3>📊 آمار نمایش</h3>
+  <div class="row">🔥 گاز:<b id="s-gas">0</b></div>
+  <div class="row">🛢️ نفت:<b id="s-oil">0</b></div>
+  <div class="row">⚡ برق:<b id="s-power">0</b></div>
+  <div class="row">🏦 بانک:<b id="s-bank">0</b></div>
+  <div class="row">🏭 صنایع:<b id="s-ind">0</b></div>
+</div>
+
+<script>
+var SERVICES = {
+  gas_line:['پایش نشتی لحظه‌ای','کنترل فشار از راه دور','قطع اضطراری خودکار','تحلیل ریسک خوردگی','مدیریت SCADA'],
+  gas_ref:['مانیتورینگ شعله','کنترل دما و فشار','سیستم اعلام حریق','اتوماسیون واحد','پایش زیست‌محیطی'],
+  gas_cgs:['تله‌متری فشار','پایش جریان لحظه‌ای','شناسایی نشت گاز','مدیریت از راه دور','هشدار انفجار'],
+  oil_ref:['کنترل فرآیند','پایش کیفیت محصول','ایمنی و آتش‌نشانی','بهینه‌سازی انرژی','بازرسی خطوط'],
+  oil_field:['پایش چاه‌ها','آنالیز تولید','کنترل تزریق','ایمنی HSE','مدیریت مخازن'],
+  petro:['کنترل کیفیت','پایش زیست‌محیطی','اتوماسیون تولید','انبارش هوشمند','مدیریت بحران'],
+  power_plant:['پایش شبکه','کنترل بار','تحلیل پایداری','هشدار خرابی','تعمیر پیشگیرانه'],
+  power_line:['پایش انتقال','شناسایی قطعی','آنالیز بار','تعمیر پیشگیرانه','مدیریت خطا'],
+  power_sub:['مانیتورینگ ترانس','کنترل ولتاژ','پایش دما','حفاظت دیجیتال','اتوماسیون پست'],
+  bank_central:['امنیت تراکنش','پایش شبکه مالی','تشخیص تقلب','پشتیبان‌گیری ابری','رمزنگاری پیشرفته'],
+  bank_branch:['امنیت شعبه','کنترل دسترسی','مانیتورینگ ATM','شبکه امن','دوربین هوشمند'],
+  industry:['پایش خط تولید','کنترل کیفیت','بهینه‌سازی انرژی','ایمنی صنعتی','اتوماسیون کارخانه']
+};
+
+var DATA = {
+  gas:{label:'🔥 صنعت گاز', color:'#ff6b6b', subs:{
+    igat:{label:'خطوط لوله IGAT', type:'line', color:'#ff6b6b', svc:'gas_line', items:[
+      {n:'IGAT-1',c:[[46.29,38.08],[48.67,31.32],[51.42,35.70]]},
+      {n:'IGAT-2',c:[[48.51,34.80],[51.66,32.65],[51.42,35.70]]},
+      {n:'IGAT-3',c:[[56.27,27.18],[52.58,29.59],[51.42,35.70]]},
+      {n:'IGAT-4',c:[[51.66,32.65],[52.58,29.59]]},
+      {n:'IGAT-5',c:[[59.60,36.29],[51.42,35.70]]},
+      {n:'IGAT-6',c:[[54.36,31.89],[51.42,35.70]]},
+      {n:'IGAT-7',c:[[57.08,30.28],[52.58,29.59]]},
+      {n:'IGAT-8',c:[[45.07,37.55],[46.29,38.08],[51.42,35.70]]},
+      {n:'IGAT-9',c:[[58.36,29.10],[52.58,29.59]]},
+      {n:'IGAT-10',c:[[49.69,34.09],[51.42,35.70]]},
+      {n:'IGAT-11',c:[[51.44,33.99],[52.58,29.59]]},
+      {n:'IGAT-12',c:[[46.29,38.08],[45.07,37.55]]}
+    ]},
+    ref:{label:'پالایشگاه‌های گاز', type:'point', color:'#ff8c8c', svc:'gas_ref', items:[
+      {n:'پارس جنوبی - عسلویه',c:[52.60,27.50]},
+      {n:'پارس شمالی',c:[52.20,27.80]},
+      {n:'فجر جم',c:[52.32,27.85]},
+      {n:'بیدبلند',c:[49.85,30.65]},
+      {n:'ایلام',c:[46.42,33.32]},
+      {n:'خانگیران',c:[55.75,37.55]},
+      {n:'شهید هاشمی‌نژاد',c:[59.20,36.30]},
+      {n:'سراجه قم',c:[50.85,34.55]}
+    ]},
+    cgs:{label:'ایستگاه‌های CGS', type:'point', color:'#ffb0b0', svc:'gas_cgs', items:[
+      {n:'CGS تهران',c:[51.42,35.70]},
+      {n:'CGS اصفهان',c:[51.66,32.65]},
+      {n:'CGS مشهد',c:[59.60,36.29]},
+      {n:'CGS تبریز',c:[46.29,38.08]},
+      {n:'CGS شیراز',c:[52.58,29.59]},
+      {n:'CGS اهواز',c:[48.67,31.32]},
+      {n:'CGS قم',c:[50.88,34.64]},
+      {n:'CGS کرج',c:[50.94,35.83]},
+      {n:'CGS رشت',c:[49.59,37.28]},
+      {n:'CGS یزد',c:[54.36,31.89]}
+    ]}
+  }},
+  oil:{label:'🛢️ صنعت نفت', color:'#c084fc', subs:{
+    ref:{label:'پالایشگاه‌های نفت', type:'point', color:'#c084fc', svc:'oil_ref', items:[
+      {n:'پالایشگاه آبادان',c:[48.29,30.34]},
+      {n:'پالایشگاه اصفهان',c:[51.66,32.65]},
+      {n:'پالایشگاه تهران',c:[51.42,35.55]},
+      {n:'پالایشگاه تبریز',c:[46.29,38.08]},
+      {n:'پالایشگاه شیراز',c:[52.58,29.59]},
+      {n:'پالایشگاه بندرعباس',c:[56.27,27.18]},
+      {n:'پالایشگاه اراک',c:[49.69,34.09]},
+      {n:'پالایشگاه لاوان',c:[52.83,26.81]},
+      {n:'پالایشگاه کرمانشاه',c:[47.07,34.31]}
+    ]},
+    field:{label:'میادین نفتی', type:'point', color:'#a855f7', svc:'oil_field', items:[
+      {n:'میدان اهواز',c:[48.67,31.32]},
+      {n:'میدان مارون',c:[49.35,30.85]},
+      {n:'میدان گچساران',c:[50.80,30.35]},
+      {n:'میدان آغاجاری',c:[49.83,30.70]},
+      {n:'میدان کرنج',c:[49.50,30.55]},
+      {n:'میدان پارسی',c:[49.90,30.45]},
+      {n:'میدان رگ سفید',c:[50.05,30.40]},
+      {n:'میدان آزادگان',c:[48.20,31.50]},
+      {n:'میدان یادآوران',c:[47.95,31.75]},
+      {n:'میدان فروزان',c:[50.20,28.20]}
+    ]},
+    petro:{label:'پتروشیمی', type:'point', color:'#9333ea', svc:'petro', items:[
+      {n:'پتروشیمی ماهشهر',c:[49.19,30.56]},
+      {n:'پتروشیمی عسلویه',c:[52.60,27.50]},
+      {n:'پتروشیمی خارگ',c:[50.32,29.26]},
+      {n:'پتروشیمی امام',c:[49.20,30.50]},
+      {n:'پتروشیمی شازند',c:[49.69,34.09]},
+      {n:'پتروشیمی تبریز',c:[46.29,38.08]},
+      {n:'پتروشیمی اراک',c:[49.69,34.09]},
+      {n:'پتروشیمی بندر امام',c:[49.08,30.55]}
+    ]}
+  }},
+  power:{label:'⚡ صنعت برق', color:'#facc15', subs:{
+    plant:{label:'نیروگاه‌ها', type:'point', color:'#facc15', svc:'power_plant', items:[
+      {n:'نیروگاه اتمی بوشهر',c:[50.83,28.83]},
+      {n:'شهید رجایی',c:[50.10,36.20]},
+      {n:'نیروگاه اصفهان',c:[51.66,32.65]},
+      {n:'نیروگاه تبریز',c:[46.29,38.08]},
+      {n:'شهید سلیمی نکا',c:[53.30,36.65]},
+      {n:'نیروگاه کارون',c:[48.70,31.30]},
+      {n:'نیروگاه دماوند',c:[51.75,35.55]},
+      {n:'نیروگاه پرند',c:[50.95,35.45]},
+      {n:'شهید منتظر قائم',c:[50.85,35.85]},
+      {n:'نیروگاه بیستون',c:[47.10,34.35]},
+      {n:'رامین اهواز',c:[48.67,31.32]},
+      {n:'نیروگاه شازند',c:[49.69,34.09]},
+      {n:'نیروگاه زرند',c:[56.55,30.80]},
+      {n:'نیروگاه سبلان',c:[48.30,38.25]},
+      {n:'نیروگاه هرمزگان',c:[56.27,27.18]}
+    ]},
+    line:{label:'خطوط انتقال', type:'line', color:'#facc15', svc:'power_line', items:[
+      {n:'تهران-اصفهان',c:[[51.42,35.70],[51.66,32.65]]},
+      {n:'تهران-مشهد',c:[[51.42,35.70],[59.60,36.29]]},
+      {n:'تهران-تبریز',c:[[51.42,35.70],[46.29,38.08]]},
+      {n:'تهران-شیراز',c:[[51.42,35.70],[52.58,29.59]]},
+      {n:'اصفهان-شیراز',c:[[51.66,32.65],[52.58,29.59]]},
+      {n:'مشهد-بندرعباس',c:[[59.60,36.29],[56.27,27.18]]},
+      {n:'تبریز-ارومیه',c:[[46.29,38.08],[45.07,37.55]]},
+      {n:'اهواز-کرمانشاه',c:[[48.67,31.32],[47.07,34.31]]},
+      {n:'کرمان-زاهدان',c:[[57.08,30.28],[60.86,29.49]]},
+      {n:'رشت-تهران',c:[[49.59,37.28],[51.42,35.70]]}
+    ]},
+    sub:{label:'پست‌های فوق توزیع', type:'point', color:'#fde047', svc:'power_sub', items:[
+      {n:'پست تهران بزرگ',c:[51.42,35.70]},
+      {n:'پست اصفهان',c:[51.66,32.65]},
+      {n:'پست مشهد',c:[59.60,36.29]},
+      {n:'پست تبریز',c:[46.29,38.08]},
+      {n:'پست شیراز',c:[52.58,29.59]},
+      {n:'پست اهواز',c:[48.67,31.32]},
+      {n:'پست قم',c:[50.88,34.64]},
+      {n:'پست کرج',c:[50.94,35.83]}
+    ]}
+  }},
+  bank:{label:'🏦 بانک‌ها', color:'#4ade80', subs:{
+    central:{label:'بانک مرکزی', type:'point', color:'#22c55e', svc:'bank_central', items:[
+      {n:'بانک مرکزی ایران',c:[51.42,35.70]}
+    ]},
+    mashhad:{label:'شعب مشهد', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - مشهد',c:[59.60,36.29]},
+      {n:'بانک ملت - مشهد',c:[59.58,36.31]},
+      {n:'بانک صادرات - مشهد',c:[59.62,36.28]},
+      {n:'بانک تجارت - مشهد',c:[59.57,36.30]},
+      {n:'بانک سپه - مشهد',c:[59.61,36.32]},
+      {n:'بانک کشاورزی - مشهد',c:[59.59,36.27]},
+      {n:'بانک مسکن - مشهد',c:[59.63,36.29]},
+      {n:'بانک پاسارگاد - مشهد',c:[59.56,36.31]},
+      {n:'بانک سامان - مشهد',c:[59.60,36.26]},
+      {n:'بانک پارسیان - مشهد',c:[59.64,36.30]}
+    ]},
+    tehran:{label:'شعب تهران', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - تهران',c:[51.42,35.70]},
+      {n:'بانک ملت - تهران',c:[51.40,35.71]},
+      {n:'بانک صادرات - تهران',c:[51.44,35.69]},
+      {n:'بانک تجارت - تهران',c:[51.41,35.72]},
+      {n:'بانک سپه - تهران',c:[51.43,35.68]},
+      {n:'بانک کشاورزی - تهران',c:[51.39,35.70]},
+      {n:'بانک مسکن - تهران',c:[51.45,35.71]},
+      {n:'بانک پاسارگاد - تهران',c:[51.38,35.69]},
+      {n:'بانک سامان - تهران',c:[51.42,35.73]},
+      {n:'بانک پارسیان - تهران',c:[51.46,35.70]}
+    ]},
+    isfahan:{label:'شعب اصفهان', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - اصفهان',c:[51.66,32.65]},
+      {n:'بانک ملت - اصفهان',c:[51.64,32.67]},
+      {n:'بانک صادرات - اصفهان',c:[51.68,32.63]},
+      {n:'بانک تجارت - اصفهان',c:[51.65,32.66]},
+      {n:'بانک سپه - اصفهان',c:[51.67,32.64]},
+      {n:'بانک مسکن - اصفهان',c:[51.69,32.66]}
+    ]},
+    shiraz:{label:'شعب شیراز', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - شیراز',c:[52.58,29.59]},
+      {n:'بانک ملت - شیراز',c:[52.56,29.61]},
+      {n:'بانک صادرات - شیراز',c:[52.60,29.57]},
+      {n:'بانک تجارت - شیراز',c:[52.57,29.60]},
+      {n:'بانک سپه - شیراز',c:[52.59,29.58]}
+    ]},
+    tabriz:{label:'شعب تبریز', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - تبریز',c:[46.29,38.08]},
+      {n:'بانک ملت - تبریز',c:[46.27,38.10]},
+      {n:'بانک صادرات - تبریز',c:[46.31,38.06]},
+      {n:'بانک تجارت - تبریز',c:[46.28,38.09]},
+      {n:'بانک سپه - تبریز',c:[46.30,38.07]}
+    ]},
+    ahvaz:{label:'شعب اهواز', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - اهواز',c:[48.67,31.32]},
+      {n:'بانک ملت - اهواز',c:[48.65,31.34]},
+      {n:'بانک صادرات - اهواز',c:[48.69,31.30]},
+      {n:'بانک تجارت - اهواز',c:[48.68,31.33]}
+    ]},
+    rasht:{label:'شعب رشت', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - رشت',c:[49.59,37.28]},
+      {n:'بانک ملت - رشت',c:[49.57,37.30]},
+      {n:'بانک صادرات - رشت',c:[49.61,37.26]}
+    ]},
+    karaj:{label:'شعب کرج', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - کرج',c:[50.94,35.83]},
+      {n:'بانک ملت - کرج',c:[50.92,35.85]},
+      {n:'بانک صادرات - کرج',c:[50.96,35.81]}
+    ]},
+    qom:{label:'شعب قم', type:'point', color:'#4ade80', svc:'bank_branch', items:[
+      {n:'بانک ملی - قم',c:[50.88,34.64]},
+      {n:'بانک ملت - قم',c:[50.86,34.66]},
+      {n:'بانک صادرات - قم',c:[50.90,34.62]}
+    ]}
+  }},
+  industry:{label:'🏭 صنایع بزرگ', color:'#06b6d4', subs:{
+    steel:{label:'فولاد', type:'point', color:'#06b6d4', svc:'industry', items:[
+      {n:'فولاد مبارکه',c:[51.55,32.38]},
+      {n:'فولاد خوزستان',c:[48.70,31.35]},
+      {n:'ذوب آهن اصفهان',c:[51.55,32.55]},
+      {n:'فولاد هرمزگان',c:[56.27,27.18]},
+      {n:'فولاد آلیاژی یزد',c:[54.36,31.89]}
+    ]},
+    copper:{label:'مس و آلومینیوم', type:'point', color:'#0891b2', svc:'industry', items:[
+      {n:'مجتمع مس سرچشمه',c:[55.85,29.98]},
+      {n:'مس میدوک',c:[56.30,30.30]},
+      {n:'آلومینیوم اراک',c:[49.69,34.09]},
+      {n:'آلومینیوم المهدی',c:[55.15,27.15]},
+      {n:'آلومینیوم جنوب',c:[52.60,27.50]}
+    ]},
+    auto:{label:'خودروسازی', type:'point', color:'#0ea5e9', svc:'industry', items:[
+      {n:'ایران خودرو',c:[51.20,35.75]},
+      {n:'سایپا',c:[51.15,35.80]},
+      {n:'پارس خودرو',c:[50.95,35.85]},
+      {n:'کرمان موتور',c:[57.08,30.28]},
+      {n:'بهمن موتور',c:[50.94,35.83]}
+    ]},
+    cement:{label:'سیمان', type:'point', color:'#0284c7', svc:'industry', items:[
+      {n:'سیمان تهران',c:[51.42,35.55]},
+      {n:'سیمان اصفهان',c:[51.66,32.65]},
+      {n:'سیمان مشهد',c:[59.60,36.29]},
+      {n:'سیمان تبریز',c:[46.29,38.08]},
+      {n:'سیمان فارس',c:[52.58,29.59]},
+      {n:'سیمان خوزستان',c:[48.67,31.32]}
+    ]}
+  }}
+};
+
+var maplibregl = window.maplibregl.default;
+var map = new maplibregl.Map({container:'map',style:'https://static.neshan.org/sdk/maplibre/styles/light.json',center:[54.0,32.0],zoom:5,apiKey:'REDACTED_NESHAN_KEY'});
+map.addControl(new maplibregl.NavigationControl(),'top-right');
+map.addControl(new maplibregl.ScaleControl(),'bottom-left');
+map.on('error',function(e){console.error('MAP:',e);});
+
+var rendered = {};
+var visible = {};
+
+function makePopup(item, svcKey){
+  var svc = SERVICES[svcKey] || [];
+  var html = '<h4>'+item.n+'</h4>';
+  if(svc.length){
+    html += '<div style="font-size:.75rem;color:#8fa2dc;margin-bottom:5px">✅ خدمات قابل ارائه:</div><ul>';
+    svc.forEach(function(s){ html += '<li>'+s+'</li>'; });
+    html += '</ul>';
+  }
+  return html;
+}
+
+function renderAll(){
+  Object.keys(DATA).forEach(function(catKey){
+    var cat = DATA[catKey];
+    Object.keys(cat.subs).forEach(function(subKey){
+      var sub = cat.subs[subKey];
+      var key = catKey+'.'+subKey;
+      rendered[key] = {lines:[], markers:[]};
+      visible[key] = true;
+      sub.items.forEach(function(item){
+        if(sub.type === 'line'){
+          var id = catKey+'-'+subKey+'-'+Math.random().toString(36).slice(2,7);
+          map.addSource(id, {type:'geojson', data:{type:'Feature', geometry:{type:'LineString', coordinates:item.c}}});
+          map.addLayer({id:id, type:'line', source:id, paint:{'line-color':sub.color,'line-width':3,'line-opacity':.85}});
+          (function(it){ map.on('click', id, function(e){ new maplibregl.Popup().setLngLat(e.lngLat).setHTML(makePopup(it, sub.svc)).addTo(map); }); })(item);
+          map.on('mouseenter', id, function(){ map.getCanvas().style.cursor = 'pointer'; });
+          map.on('mouseleave', id, function(){ map.getCanvas().style.cursor = ''; });
+          rendered[key].lines.push(id);
+        } else {
+          var el = document.createElement('div');
+          el.style.cssText = 'width:16px;height:16px;background:'+sub.color+';border:2px solid #fff;border-radius:50%;box-shadow:0 0 10px '+sub.color+';cursor:pointer';
+          var m = new maplibregl.Marker({element:el}).setLngLat(item.c).addTo(map);
+          m.setPopup(new maplibregl.Popup({offset:15}).setHTML(makePopup(item, sub.svc)));
+          rendered[key].markers.push(m);
+        }
+      });
+    });
+  });
+}
+
+function setVisibility(fn){
+  Object.keys(rendered).forEach(function(key){
+    var show = fn(key);
+    rendered[key].lines.forEach(function(id){ if(map.getLayer(id)) map.setLayoutProperty(id, 'visibility', show?'visible':'none'); });
+    rendered[key].markers.forEach(function(m){ m.getElement().style.display = show ? 'block' : 'none'; });
+  });
+}
+
+function countVisible(){
+  var c = {gas:0, oil:0, power:0, bank:0, industry:0};
+  Object.keys(rendered).forEach(function(key){
+    if(visible[key]){
+      var cat = key.split('.')[0];
+      c[cat] = (c[cat]||0) + rendered[key].lines.length + rendered[key].markers.length;
+    }
+  });
+  document.getElementById('s-gas').textContent = c.gas;
+  document.getElementById('s-oil').textContent = c.oil;
+  document.getElementById('s-power').textContent = c.power;
+  document.getElementById('s-bank').textContent = c.bank;
+  document.getElementById('s-ind').textContent = c.industry;
+}
+
+function buildSidebar(){
+  var container = document.getElementById('cats');
+  Object.keys(DATA).forEach(function(catKey){
+    var cat = DATA[catKey];
+    var div = document.createElement('div');
+    div.className = 'cat';
+    var header = document.createElement('div');
+    header.className = 'cat-h';
+    header.innerHTML = '<span>'+cat.label+'</span><span class="arrow">◀</span>';
+    header.addEventListener('click', function(){ div.classList.toggle('open'); });
+    div.appendChild(header);
+    var body = document.createElement('div');
+    body.className = 'cat-body';
+    // Show all in category
+    var allBtn = document.createElement('div');
+    allBtn.className = 'sub';
+    allBtn.style.background = 'linear-gradient(90deg,rgba(192,132,252,.25),transparent)';
+    allBtn.style.color = '#c084fc';
+    allBtn.style.fontWeight = '700';
+    allBtn.textContent = '▶ نمایش همه در این دسته';
+    allBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      document.querySelectorAll('.sub').forEach(function(s){ s.classList.remove('active'); });
+      allBtn.classList.add('active');
+      Object.keys(visible).forEach(function(vk){ visible[vk] = vk.split('.')[0] === catKey; });
+      setVisibility(function(key){ return key.split('.')[0] === catKey; });
+      countVisible();
+    });
+    body.appendChild(allBtn);
+    // Sub items
+    Object.keys(cat.subs).forEach(function(subKey){
+      var sub = cat.subs[subKey];
+      var subDiv = document.createElement('div');
+      subDiv.className = 'sub';
+      subDiv.innerHTML = sub.label + ' <span class="cnt">'+sub.items.length+'</span>';
+      subDiv.addEventListener('click', function(e){
+        e.stopPropagation();
+        document.querySelectorAll('.sub').forEach(function(s){ s.classList.remove('active'); });
+        subDiv.classList.add('active');
+        var k = catKey+'.'+subKey;
+        Object.keys(visible).forEach(function(vk){ visible[vk] = false; });
+        visible[k] = true;
+        setVisibility(function(key){ return key === k; });
+        countVisible();
+        // fit bounds
+        var coords = [];
+        sub.items.forEach(function(it){
+          if(sub.type === 'line') coords = coords.concat(it.c);
+          else coords.push(it.c);
+        });
+        if(coords.length){
+          var lngs = coords.map(function(c){return c[0];});
+          var lats = coords.map(function(c){return c[1];});
+          map.fitBounds([[Math.min.apply(null,lngs), Math.min.apply(null,lats)], [Math.max.apply(null,lngs), Math.max.apply(null,lats)]], {padding:80, duration:800, maxZoom:10});
+        }
+      });
+      body.appendChild(subDiv);
+    });
+    div.appendChild(body);
+    container.appendChild(div);
+  });
+}
+
+document.getElementById('showAll').addEventListener('click', function(){
+  document.querySelectorAll('.sub').forEach(function(s){ s.classList.remove('active'); });
+  Object.keys(visible).forEach(function(vk){ visible[vk] = true; });
+  setVisibility(function(){ return true; });
+  countVisible();
+  map.flyTo({center:[54.0,32.0], zoom:5, duration:800});
+});
+
+map.on('load', function(){
+  renderAll();
+  buildSidebar();
+  countVisible();
+  console.log('MAP READY');
+});
+</script>
+</body>
+</html>
