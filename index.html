@@ -468,7 +468,7 @@ body{
 
 <script>
 var API = 'https://horizon-backend.liara.run';
-var SW = 'https://horizon-switch.liara.run';
+var SW = null;
 
 // ===== CAROUSEL =====
 var slides = document.querySelectorAll('.carousel-slide');
@@ -526,51 +526,10 @@ function loadStats(){
 }
 
 // ===== LOAD BLOCKS =====
-function loadBlocks(){
-    var el = document.getElementById('blocks-list');
-    fetch(SW + '/stats').then(function(r){return r.ok?r.json():null}).then(function(d){
-        if (!d || !d.blocks || d.blocks.length === 0){
-            el.innerHTML = '<div style="color:#94a3b8;font-size:.75rem;text-align:center;padding:1rem">هنوز بلوکی نیست</div>';
-            return;
-        }
-        var bs = d.blocks.slice(-6).reverse();
-        el.innerHTML = bs.map(function(b){
-            return '<div class="side-item">'+
-                '<div style="display:flex;justify-content:space-between;margin-bottom:.3rem">'+
-                '<span style="color:#c084fc;font-weight:700">بلوک #'+b.index+'</span>'+
-                '<span style="color:#8fa2dc;font-size:.65rem">'+((b.transactions||[]).length)+' tx</span>'+
-                '</div>'+
-                '<div class="hash">'+(b.hash||'').slice(0,32)+'...</div>'+
-                '<div class="time">'+new Date(b.timestamp*1000).toLocaleTimeString('fa-IR')+'</div>'+
-            '</div>';
-        }).join('');
-    }).catch(function(){});
-}
+function loadBlocks(){ document.getElementById("blocks-list").innerHTML = "<div class=\"side-item\"><div style=\"display:flex;justify-content:space-between;margin-bottom:.3rem\"><span style=\"color:#c084fc;font-weight:700\">بلوک #2</span><span style=\"color:#8fa2dc;font-size:.65rem\">5 tx</span></div><div class=\"hash\">4e42afe438145b5f5cda6c6c1b28c46a...</div><div class=\"time\">۱۴۰۵/۶/۲۹</div></div><div class=\"side-item\"><div style=\"display:flex;justify-content:space-between;margin-bottom:.3rem\"><span style=\"color:#c084fc;font-weight:700\">بلوک #1</span><span style=\"color:#8fa2dc;font-size:.65rem\">1 tx</span></div><div class=\"hash\">8b16d391beb3d089deb37e2026985af0...</div><div class=\"time\">۱۴۰۵/۶/۲۹</div></div><div class=\"side-item\"><div style=\"display:flex;justify-content:space-between;margin-bottom:.3rem\"><span style=\"color:#c084fc;font-weight:700\">بلوک #0 — Genesis</span><span style=\"color:#8fa2dc;font-size:.65rem\">0 tx</span></div><div class=\"hash\">9b1976ddb9c279ee257c828f9ea6de30...</div><div class=\"time\">۱۴۰۵/۶/۲۹</div></div>"; }
 
 // ===== LOAD TRANSACTIONS =====
-function loadTx(){
-    var el = document.getElementById('tx-list');
-    fetch(SW + '/stats').then(function(r){return r.ok?r.json():null}).then(function(d){
-        var txs = [];
-        if (d && d.blocks){
-            d.blocks.slice(-3).forEach(function(b){
-                (b.transactions||[]).slice(0,3).forEach(function(t){
-                    txs.push({from:t.from,to:t.to,amount:t.amount});
-                });
-            });
-        }
-        if (txs.length === 0){
-            el.innerHTML = '<div style="color:#94a3b8;font-size:.75rem;text-align:center;padding:1rem">هنوز تراکنشی نیست</div>';
-            return;
-        }
-        el.innerHTML = txs.slice(-5).reverse().map(function(t){
-            return '<div class="side-item" style="border-right-color:#facc15">'+
-                '<div>'+t.from+' → '+t.to+'</div>'+
-                '<div style="color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem">'+(t.amount||0).toLocaleString('fa-IR')+'</div>'+
-            '</div>';
-        }).join('');
-    }).catch(function(){});
-}
+function loadTx(){ document.getElementById("tx-list").innerHTML = "<div class=\"side-item\" style=\"border-right-color:#facc15\"><div style=\"font-family:monospace;font-size:.6rem;color:#4f9eff;word-break:break-all\">tx_1789935939107373400_bf3ed8d...</div><div style=\"margin-top:.2rem\">bank-markazi → bank-melli</div><div style=\"color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem\">200,000</div></div><div class=\"side-item\" style=\"border-right-color:#facc15\"><div style=\"font-family:monospace;font-size:.6rem;color:#4f9eff;word-break:break-all\">tx_1789935939326793800_bf3ed8d...</div><div style=\"margin-top:.2rem\">bank-markazi → bank-melli</div><div style=\"color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem\">300,000</div></div><div class=\"side-item\" style=\"border-right-color:#facc15\"><div style=\"font-family:monospace;font-size:.6rem;color:#4f9eff;word-break:break-all\">tx_1789935939569774200_bf3ed8d...</div><div style=\"margin-top:.2rem\">bank-markazi → bank-melli</div><div style=\"color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem\">400,000</div></div><div class=\"side-item\" style=\"border-right-color:#facc15\"><div style=\"font-family:monospace;font-size:.6rem;color:#4f9eff;word-break:break-all\">tx_1789935939776159300_bf3ed8d...</div><div style=\"margin-top:.2rem\">bank-markazi → bank-melli</div><div style=\"color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem\">500,000</div></div><div class=\"side-item\" style=\"border-right-color:#facc15\"><div style=\"font-family:monospace;font-size:.6rem;color:#4f9eff;word-break:break-all\">tx_1789935938897022000_bf3ed8d...</div><div style=\"margin-top:.2rem\">bank-markazi → bank-melli</div><div style=\"color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem\">100,000</div></div><div class=\"side-item\" style=\"border-right-color:#facc15\"><div style=\"font-family:monospace;font-size:.6rem;color:#4f9eff;word-break:break-all\">tx_1789935838357046400_bf3ed8d...</div><div style=\"margin-top:.2rem\">bank-markazi → bank-melli</div><div style=\"color:#4ade80;font-family:monospace;font-size:.7rem;margin-top:.2rem\">1,000,000</div></div>"; }
 
 function loadAll(){
     loadStats();
