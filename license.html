@@ -179,7 +179,7 @@ function api(path, opts) {
         'Content-Type': 'application/json',
         'X-Customer-Token': token
     }, opts.headers || {});
-    return fetch(SWITCH_URL + path, opts).then(function(r) {
+    return hzFetch(path, opts).then(function(r) {
         return r.json().then(function(d) { return { ok: r.ok, data: d }; });
     });
 }
@@ -197,7 +197,7 @@ function doLogin() {
 
     st.innerHTML = '⏳ در حال بررسی...';
 
-    fetch(SWITCH_URL + '/api/v1/customer/login', {
+    hzFetch('/api/v1/customer/login', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({customer_id: cid, password: pass})
@@ -223,7 +223,7 @@ function doLogin() {
 function doLogout() {
     if (!confirm('خارج می‌شوید؟')) return;
     if (token) {
-        fetch(SWITCH_URL + '/api/v1/customer/logout', {
+        hzFetch('/api/v1/customer/logout', {
             method: 'POST',
             headers: {'X-Customer-Token': token}
         }).catch(function() {});
@@ -260,7 +260,7 @@ function loadAll() {
 }
 
 function loadLicenses() {
-    api('/api/v1/customer/licenses').then(function(res) {
+    hzFetch('/api/v1/customer/licenses').then(function(res) {
         var d = res.data;
         var el = document.getElementById('licenses-list');
         var list = (d.licenses || []);
@@ -313,7 +313,7 @@ function loadLicenses() {
 }
 
 function loadInvoices() {
-    api('/api/v1/customer/invoices').then(function(res) {
+    hzFetch('/api/v1/customer/invoices').then(function(res) {
         var d = res.data;
         var el = document.getElementById('invoices-list');
         var list = (d.invoices || []);
@@ -364,7 +364,7 @@ function renewLicense(licenseID) {
         return;
     }
 
-    api('/api/v1/customer/license/renew/' + licenseID, {
+    hzFetch('/api/v1/customer/license/renew/' + licenseID, {
         method: 'POST',
         body: JSON.stringify({duration_hours: hours})
     }).then(function(res) {
@@ -384,7 +384,7 @@ function renewLicense(licenseID) {
 }
 
 function downloadLicense(licenseID) {
-    fetch(SWITCH_URL + '/api/v1/customer/license/download/' + licenseID, {
+    hzFetch('/api/v1/customer/license/download/' + licenseID, {
         headers: {'X-Customer-Token': token}
     })
     .then(function(r) { return r.json(); })
@@ -417,7 +417,7 @@ window.addEventListener('DOMContentLoaded', function() {
         token = saved;
         customer = JSON.parse(savedData);
         // Validate token
-        api('/api/v1/customer/me').then(function(res) {
+        hzFetch('/api/v1/customer/me').then(function(res) {
             if (res.ok) {
                 showDash();
             } else {

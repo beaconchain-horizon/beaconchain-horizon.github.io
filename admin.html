@@ -257,7 +257,7 @@ function doLogin(){
     if(pk.length>10){
         // Private key login — verify via backend
         st.innerHTML='<span style="color:#4f9eff">⏳ در حال تأیید کلید...</span>';
-        fetch(API+'/api/v1/license/generate',{
+        hzFetch('/api/v1/license/generate',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({product_id:'horizon-core',user_id:'admin_genesis',volume:1,duration:1,private_key:pk})
@@ -335,7 +335,7 @@ async function genLic(){
     out.innerHTML='⏳ در حال تولید لایسنس با امضای ECDSA...';
 
     try{
-        const r=await fetch(API+'/api/v1/license/generate',{
+        const r=await hzFetch('/api/v1/license/generate',{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify({
@@ -452,7 +452,7 @@ function loadStats(){
 
 async function loadTPS(){
     try{
-        const r=await fetch(SW+'/benchmark');
+        const r=await hzFetch('/benchmark');
         if(r.ok){
             const d=await r.json();
             document.getElementById('s3').textContent=Math.round(d.tps).toLocaleString();
@@ -466,7 +466,7 @@ async function loadTPS(){
 
 async function loadServerStatus(){
     try{
-        const r=await fetch(API+'/api/v1/health');
+        const r=await hzFetch('/api/v1/health');
         document.getElementById('s4').textContent=r.ok?'✅ آنلاین':'❌ قطع';
     } catch(e){
         document.getElementById('s4').textContent='❌ قطع';
@@ -476,7 +476,7 @@ async function loadServerStatus(){
 async function loadBlocks(){
     const bl=document.getElementById('blkList');
     try{
-        const r=await fetch(SW+'/stats');
+        const r=await hzFetch('/stats');
         if(!r.ok) throw new Error('Failed');
         const d=await r.json();
         const bs=(d.blocks||[]).slice(-10).reverse();
