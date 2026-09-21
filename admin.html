@@ -52,6 +52,37 @@
 <script src="clients.js"></script>
 </head>
 <body>
+<script>
+// ═══════════════════════════════════════════════════════
+//  Horizon — Multi-source API with static fallback
+// ═══════════════════════════════════════════════════════
+var API_SOURCES = [
+  'http://localhost:8080',
+  'https://horizon-switch.liara.run',
+  ''
+];
+var STATIC_FALLBACK = {
+  '/stats':        'data/stats.json',
+  '/blocks':       'data/blocks.json',
+  '/transactions': 'data/txs.json',
+  '/api/v1/stats':        'data/stats.json',
+  '/api/v1/block/list':   'data/blocks.json',
+  '/api/v1/tx/list':      'data/txs.json'
+};
+async function hzFetch(path, opts) {
+  for (var i = 0; i < API_SOURCES.length; i++) {
+    var base = API_SOURCES[i];
+    if (!base && !STATIC_FALLBACK[path]) continue;
+    var url = base ? (base + path) : STATIC_FALLBACK[path];
+    try {
+      var r = await fetch(url, Object.assign({timeout: 3000}, opts || {}));
+      if (r.ok) { console.log('[HZ] OK from', url); return await r.json(); }
+    } catch(e) { /* next */ }
+  }
+  console.warn('[HZ] all sources failed for', path);
+  throw new Error('all sources failed');
+}
+</script>
 
 <!-- ============ LOGIN ============ -->
 <div class="login" id="login-screen">
@@ -188,7 +219,7 @@
 
 <script>
 const API='https://beaconchain-horizon.github.io';
-const SW='https://horizon-switch.liara.run';
+const SW = 'http://localhost:8080'; // multi-source via hzFetch
 const PASSWORD='REMOVED';
 const PUBLIC_ADDR='REDACTED_WALLET';
 const SIGNATURE='0x0a91d71af46d7cab4e0658a7002bc4e3b36a544aa29f5028b1d6a9e57063ed777dc483a36dc9d72c343fb846318517b2b9e4b8beab18f8dc3b4cf5b84be223831b';

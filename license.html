@@ -63,6 +63,37 @@ body{background:linear-gradient(135deg,#020617,#0f172a,#1e1b4b);color:#eef2ff;mi
 </style>
 </head>
 <body>
+<script>
+// ═══════════════════════════════════════════════════════
+//  Horizon — Multi-source API with static fallback
+// ═══════════════════════════════════════════════════════
+var API_SOURCES = [
+  'http://localhost:8080',
+  'https://horizon-switch.liara.run',
+  ''
+];
+var STATIC_FALLBACK = {
+  '/stats':        'data/stats.json',
+  '/blocks':       'data/blocks.json',
+  '/transactions': 'data/txs.json',
+  '/api/v1/stats':        'data/stats.json',
+  '/api/v1/block/list':   'data/blocks.json',
+  '/api/v1/tx/list':      'data/txs.json'
+};
+async function hzFetch(path, opts) {
+  for (var i = 0; i < API_SOURCES.length; i++) {
+    var base = API_SOURCES[i];
+    if (!base && !STATIC_FALLBACK[path]) continue;
+    var url = base ? (base + path) : STATIC_FALLBACK[path];
+    try {
+      var r = await fetch(url, Object.assign({timeout: 3000}, opts || {}));
+      if (r.ok) { console.log('[HZ] OK from', url); return await r.json(); }
+    } catch(e) { /* next */ }
+  }
+  console.warn('[HZ] all sources failed for', path);
+  throw new Error('all sources failed');
+}
+</script>
 <div class="cont">
 
 <!-- LOGIN -->
@@ -130,7 +161,7 @@ body{background:linear-gradient(135deg,#020617,#0f172a,#1e1b4b);color:#eef2ff;mi
 <div id="toast" class="toast"></div>
 
 <script>
-var SWITCH_URL = 'https://beaconchain-horizon.github.io';
+var SWITCH_URL = 'http://localhost:8080';
 var token = null;
 var customer = null;
 
