@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gray-900 text-white">
-<a href="store-photos.html" style="display:block;background:linear-gradient(135deg,#f59e0b,#3b82f6);color:#0a0e17;text-align:center;padding:14px;font-weight:700;text-decoration:none;font-family:Tahoma;font-size:16px;border-radius:8px;margin:8px">&#127981; مشاهده گالری تصاویر صنایع</a>
     <header class="bg-gray-800 shadow-lg border-b border-gray-700">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
