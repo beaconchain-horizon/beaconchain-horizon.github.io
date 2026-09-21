@@ -241,15 +241,21 @@ function doLogin(){
     const pw=document.getElementById('pw').value.trim();
     const st=document.getElementById('lst');
 
+    // Always save pk if provided
+    if(pk && pk.length>10){
+        localStorage.setItem('hz_private_key', pk);
+        console.log('[HZ] private key saved');
+    }
+
     if(pw===PASSWORD || pw==='admin'){
-        // Password login — quick
+        // Password login — key saved above if provided
         localStorage.setItem('hz_admin_session', JSON.stringify({
-            method:'password',
+            method: pk ? 'password+key' : 'password',
             public_address:PUBLIC_ADDR,
             signature:SIGNATURE,
             login_at:new Date().toISOString()
         }));
-        st.innerHTML='<span style="color:#4ade80">✅ ورود موفق</span>';
+        st.innerHTML='<span style="color:#4ade80">✅ ورود موفق' + (pk ? ' — کلید ذخیره شد' : '') + '</span>';
         setTimeout(showDash,500);
         return;
     }
