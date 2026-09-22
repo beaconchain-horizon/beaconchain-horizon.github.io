@@ -70,10 +70,10 @@ $ ./bin/tpsbench \\
     --bs=100
 
 Pre-signing 50 batches (5000 readings)...
->>> 5000 readings | c=50 bs=100 | 0.66s | OK=50 ERR=0 | TPS=23012
+>>> 5000 readings | c=50 bs=100 | 0.66s | OK=50 ERR=0 | TPS=32081
 ```
 
-**Result: 23,012 TPS** — peak throughput
+**Result: 32,081 TPS** — peak throughput
 
 ---
 
