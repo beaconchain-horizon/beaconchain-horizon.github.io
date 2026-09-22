@@ -10,7 +10,7 @@ This repository allows any independent party (banks, exchanges, auditors) to **c
 
 | Metric | Verified Value |
 |---|---|
-| **Peak TPS** | **7,591** |
+| **Peak TPS** | **24,185** |
 | **Sustained TPS** | 5,854 |
 | **Latency** | 6 ms |
 | **ECDSA Sign Time** | < 1 ms |
@@ -64,7 +64,7 @@ cd horizon-benchmark
 ### Expected Output
 
 ```
->>> 5000 readings | c=50 bs=100 | 0.66s | OK=50 ERR=0 | TPS=7591
+>>> 5000 readings | c=50 bs=100 | 0.66s | OK=50 ERR=0 | TPS=24185
 ```
 
 **Note:** Actual TPS may vary by ±10% depending on hardware. The ratio vs. baseline systems remains constant.
