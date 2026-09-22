@@ -2,431 +2,418 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>پنل مشتری · Horizon Angel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horizon Angel · پنل مشتری</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-*{font-family:Tahoma;box-sizing:border-box;margin:0;padding:0}
-body{background:linear-gradient(135deg,#020617,#0f172a,#1e1b4b);color:#eef2ff;min-height:100vh;padding:2rem}
-.cont{max-width:1200px;margin:0 auto}
-.card{background:rgba(15,23,42,.85);backdrop-filter:blur(20px);border:1px solid rgba(79,158,255,.2);border-radius:1.5rem;padding:2rem;margin-bottom:1.5rem}
-.login-box{max-width:450px;margin:5rem auto}
-.login-box h1{text-align:center;font-size:2rem;background:linear-gradient(135deg,#4f9eff,#c084fc);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.5rem}
-.login-box p{text-align:center;color:#8fa2dc;font-size:.85rem;margin-bottom:2rem}
-.fg{margin-bottom:1rem}
-.fg label{display:block;font-size:.75rem;color:#8fa2dc;margin-bottom:.4rem}
-.fg input{width:100%;background:#020617;border:1px solid #334155;border-radius:.8rem;padding:.9rem;color:#fff;font-size:.9rem;font-family:monospace;outline:none}
-.fg input:focus{border-color:#4f9eff;box-shadow:0 0 20px rgba(79,158,255,.3)}
-.btn{background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;border:none;padding:.9rem 2rem;border-radius:1rem;font-weight:700;cursor:pointer;font-size:.9rem;width:100%;font-family:Tahoma;transition:.2s}
-.btn:hover{transform:translateY(-2px);box-shadow:0 15px 40px rgba(79,158,255,.5)}
-.btn-sm{width:auto;padding:.5rem 1rem;font-size:.75rem;border-radius:.6rem;display:inline-block}
-.btn-green{background:linear-gradient(135deg,#4ade80,#22c55e)}
-.btn-outline{background:transparent;border:1px solid #4f9eff;color:#4f9eff}
-.hdr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
-.hdr h1{font-size:1.5rem;color:#4f9eff}
-.hdr .info{font-size:.8rem;color:#8fa2dc;margin-top:.3rem}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:1.5rem}
-.stat{padding:1.2rem;background:rgba(0,0,0,.3);border-radius:1rem;border:1px solid rgba(79,158,255,.15);text-align:center}
-.stat .num{font-size:1.8rem;font-weight:900;color:#4ade80;font-family:monospace}
-.stat .lbl{font-size:.75rem;color:#8fa2dc;margin-top:.3rem}
-.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;border-bottom:1px solid rgba(79,158,255,.2);padding-bottom:.5rem}
-.tab{padding:.6rem 1.2rem;background:transparent;border:none;color:#8fa2dc;cursor:pointer;border-radius:.6rem;font-family:Tahoma;font-size:.85rem}
-.tab:hover{background:rgba(79,158,255,.1)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Tahoma,sans-serif}
+body{background:linear-gradient(135deg,#0a1628 0%,#1a2942 50%,#0d1b2e 100%);color:#eef2ff;min-height:100vh;padding:20px}
+.cont{max-width:800px;margin:0 auto}
+h1{color:#4f9eff;text-align:center;font-size:1.8rem;margin-bottom:5px}
+.sub{color:#8fa2dc;text-align:center;font-size:.85rem;margin-bottom:25px}
+.card{background:rgba(20,32,55,.85);border:1px solid rgba(79,158,255,.25);border-radius:15px;padding:22px;margin-bottom:18px}
+.card h2{color:#c084fc;font-size:1.1rem;margin-bottom:14px;border-bottom:1px solid rgba(79,158,255,.15);padding-bottom:10px}
+label{display:block;color:#cbd5e1;font-size:.85rem;margin:10px 0 5px}
+input,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid rgba(79,158,255,.3);background:rgba(10,22,40,.8);color:#fff;font-family:inherit;font-size:.85rem}
+input:focus,textarea:focus{outline:none;border-color:#4f9eff}
+textarea{font-family:monospace;font-size:.7rem;direction:ltr;text-align:left;min-height:80px;resize:vertical}
+.btn{width:100%;padding:13px;margin-top:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;font-size:.9rem}
+.btn:hover{opacity:.9}
+.btn-green{background:linear-gradient(135deg,#4ade80,#22c55e);color:#000}
+.btn-red{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.btn-gray{background:rgba(30,45,70,.8);border:1px solid rgba(79,158,255,.3)}
+.status{padding:12px;border-radius:8px;margin-top:12px;font-size:.85rem;text-align:center;display:none}
+.status.ok{background:rgba(74,222,128,.15);border:1px solid #4ade80;color:#4ade80}
+.status.err{background:rgba(239,68,68,.15);border:1px solid #ef4444;color:#ef4444}
+.status.info{background:rgba(79,158,255,.15);border:1px solid #4f9eff;color:#4f9eff}
+.status.warn{background:rgba(250,204,21,.15);border:1px solid #facc15;color:#facc15}
+.file-label{display:block;padding:20px;border:2px dashed rgba(79,158,255,.4);border-radius:10px;text-align:center;cursor:pointer;color:#4f9eff}
+.file-label:hover{background:rgba(79,158,255,.08)}
+.file-label input{display:none}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+.info-item{background:rgba(10,22,40,.6);padding:12px;border-radius:10px;border-right:3px solid #4f9eff}
+.info-item .label{font-size:.7rem;color:#8fa2dc;margin-bottom:4px}
+.info-item .value{font-size:1rem;font-weight:700;color:#4ade80;font-family:monospace}
+.info-item .value.warn{color:#facc15}
+.info-item .value.err{color:#ef4444}
+.progress{background:rgba(10,22,40,.6);border-radius:10px;height:20px;margin-top:8px;overflow:hidden;position:relative}
+.progress-bar{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);transition:width .5s}
+.progress-bar.warn{background:linear-gradient(90deg,#facc15,#f59e0b)}
+.progress-bar.err{background:linear-gradient(90deg,#ef4444,#dc2626)}
+.progress-text{position:absolute;top:0;left:0;right:0;text-align:center;line-height:20px;font-size:.7rem;color:#000;font-weight:700}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;background:linear-gradient(135deg,#4ade80,#22c55e);color:#000}
+.badge.warn{background:linear-gradient(135deg,#facc15,#f59e0b)}
+.badge.err{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+.mono{font-family:monospace;font-size:.7rem;color:#8fa2dc;word-break:break-all;background:rgba(0,0,0,.4);padding:8px;border-radius:6px;direction:ltr;text-align:left;margin-top:8px}
+.tab{display:inline-block;padding:8px 16px;cursor:pointer;border-radius:8px;margin-left:5px;font-size:.8rem;color:#8fa2dc;transition:.2s}
 .tab.active{background:linear-gradient(135deg,#4f9eff,#c084fc);color:#fff;font-weight:700}
-.panel{display:none}
-.panel.active{display:block}
-.lic-card{background:rgba(0,0,0,.25);border:1px solid rgba(79,158,255,.2);border-radius:1rem;padding:1.2rem;margin-bottom:1rem}
-.lic-card.expired{border-color:rgba(248,113,113,.4)}
-.lic-card.grace{border-color:rgba(250,204,21,.4)}
-.lic-card .row{display:flex;justify-content:space-between;padding:.4rem 0;font-size:.85rem;flex-wrap:wrap;gap:.3rem}
-.lic-card .lbl{color:#8fa2dc}
-.lic-card .val{font-family:monospace;color:#4ade80;word-break:break-all;max-width:60%;text-align:left}
-.lic-card .actions{margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap}
-.tbl{width:100%;border-collapse:collapse;border-radius:1rem;overflow:hidden;margin-top:1rem}
-.tbl th{background:linear-gradient(135deg,#1e293b,#0f172a);color:#4f9eff;padding:.9rem;text-align:right;font-size:.75rem}
-.tbl td{padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.05);font-size:.8rem}
-.badge{padding:.25rem .7rem;border-radius:20px;font-size:.7rem;font-weight:700;display:inline-block}
-.badge.active{background:rgba(74,222,128,.15);color:#4ade80}
-.badge.paid{background:rgba(74,222,128,.15);color:#4ade80}
-.badge.pending{background:rgba(250,204,21,.15);color:#facc15}
-.badge.expired{background:rgba(248,113,113,.15);color:#f87171}
-.badge.grace{background:rgba(250,204,21,.15);color:#facc15}
-.empty{text-align:center;color:#94a3b8;padding:2rem;font-size:.85rem}
-.toast{position:fixed;top:2rem;left:50%;transform:translateX(-50%);background:#1e293b;padding:1rem 2rem;border-radius:1rem;border:1px solid #4f9eff;color:#fff;z-index:9999;display:none;font-size:.9rem;max-width:90vw}
-.toast.success{border-color:#4ade80;color:#4ade80}
-.toast.error{border-color:#f87171;color:#f87171}
-.conn{font-size:.75rem;color:#8fa2dc}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:.3rem}
-.dot.on{background:#4ade80;box-shadow:0 0 10px #4ade80}
-.dot.off{background:#f87171}
-.warn{background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.3);border-radius:.8rem;padding:.8rem 1rem;font-size:.8rem;color:#facc15;margin-bottom:1rem}
+.tab:hover:not(.active){background:rgba(79,158,255,.15)}
 </style>
 </head>
 <body>
-<script>
-// ═══════════════════════════════════════════════════════
-//  Horizon — Multi-source API with static fallback
-// ═══════════════════════════════════════════════════════
-var API_SOURCES = [
-  'http://localhost:8080',
-  'https://horizon-switch.liara.run',
-  ''
-];
-var STATIC_FALLBACK = {
-  '/stats':        'data/stats.json',
-  '/blocks':       'data/blocks.json',
-  '/transactions': 'data/txs.json',
-  '/api/v1/stats':        'data/stats.json',
-  '/api/v1/block/list':   'data/blocks.json',
-  '/api/v1/tx/list':      'data/txs.json'
-};
-async function hzFetch(path, opts) {
-  for (var i = 0; i < API_SOURCES.length; i++) {
-    var base = API_SOURCES[i];
-    if (!base && !STATIC_FALLBACK[path]) continue;
-    var url = base ? (base + path) : STATIC_FALLBACK[path];
-    try {
-      var r = await fetch(url, Object.assign({timeout: 3000}, opts || {}));
-      if (r.ok) { console.log('[HZ] OK from', url); return await r.json(); }
-    } catch(e) { /* next */ }
-  }
-  console.warn('[HZ] all sources failed for', path);
-  throw new Error('all sources failed');
-}
-</script>
 <div class="cont">
 
-<!-- LOGIN -->
-<div id="login-screen" class="login-box card">
-<h1><i class="fas fa-user"></i> پنل مشتری</h1>
-<p>Horizon Angel · ورود به حساب مشتری</p>
+<h1>🔷 Horizon Angel</h1>
+<p class="sub">پنل مشتری · License Validation</p>
 
-<div class="fg">
-<label>شناسه مشتری</label>
-<input type="text" id="cust-id" placeholder="bank_markazi">
+<!-- Public Key Setup -->
+<div class="card" id="setupCard">
+<h2>🔑 کلید عمومی سیستم (بارگذاری اولیه)</h2>
+<p style="color:#8fa2dc;font-size:.75rem;margin-bottom:10px">این کلید را یک بار از پشتیبانی بگیرید و اینجا وارد کنید. برای ورودهای بعدی ذخیره می‌شود.</p>
+<textarea id="pubkey" placeholder="0x04a21d0cdfb9aae6..."></textarea>
+<button class="btn" onclick="savePubkey()">💾 ذخیره کلید عمومی</button>
+<div id="pubkeyStatus" class="status"></div>
+<div id="pubkeyInfo" class="mono" style="display:none"></div>
 </div>
 
-<div class="fg">
-<label>رمز عبور</label>
-<input type="password" id="cust-pass" placeholder="••••••••">
+<!-- Login Section -->
+<div class="card" id="loginCard" style="display:none">
+<h2>🔐 ورود با لایسنس</h2>
+
+<div style="margin-bottom:15px">
+<span class="tab active" id="tabFile" onclick="switchMode('file')">📁 آپلود فایل .lic</span>
+<span class="tab" id="tabPaste" onclick="switchMode('paste')">📋 پیست دستی</span>
 </div>
 
-<button class="btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> ورود</button>
-<div id="login-status" style="text-align:center;font-size:.8rem;color:#8fa2dc;margin-top:1rem"></div>
+<div id="modeFile">
+<label class="file-label" for="licFile">
+📁 فایل لایسنس (.lic) را انتخاب کنید
+<input type="file" id="licFile" accept=".lic,.json,.txt">
+</label>
 </div>
 
-<!-- DASHBOARD -->
-<div id="dash" style="display:none">
+<div id="modePaste" style="display:none">
+<label>شناسه مشتری (user_id)</label>
+<input type="text" id="pasteUserId" placeholder="bank-markazi">
+<label>امضا (signature)</label>
+<textarea id="pasteSignature" placeholder="7f9acf4f27896e83..."></textarea>
+<button class="btn" onclick="loginPaste()">🔓 ورود</button>
+</div>
 
-<div class="hdr">
+<div id="loginStatus" class="status"></div>
+</div>
+
+<!-- License Info -->
+<div class="card" id="infoCard" style="display:none">
+<h2>📋 اطلاعات لایسنس شما</h2>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
 <div>
-<h1><i class="fas fa-building"></i> <span id="cust-name">—</span></h1>
-<div class="info">
-شناسه: <span id="cust-id-show">—</span>
-&nbsp;·&nbsp; نوع: <span id="cust-type-show">—</span>
+<div style="color:#8fa2dc;font-size:.75rem">شناسه لایسنس</div>
+<div style="color:#4f9eff;font-family:monospace;font-size:.9rem" id="licId">—</div>
 </div>
-</div>
-<button class="btn btn-sm btn-outline" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> خروج</button>
+<span class="badge" id="statusBadge">فعال</span>
 </div>
 
-<!-- STATS -->
-<div class="stats">
-<div class="stat"><div class="num" id="s-licenses">—</div><div class="lbl">لایسنس‌ها</div></div>
-<div class="stat"><div class="num" id="s-active">—</div><div class="lbl">فعال</div></div>
-<div class="stat"><div class="num" id="s-invoices">—</div><div class="lbl">فاکتورها</div></div>
-<div class="stat"><div class="num" id="s-paid">—</div><div class="lbl">پرداخت‌شده</div></div>
+<div class="info-grid">
+<div class="info-item">
+<div class="label">🏦 مشتری</div>
+<div class="value" id="infoUser">—</div>
 </div>
-
-<!-- TABS -->
-<div class="tabs">
-<button class="tab active" onclick="showTab('licenses', this)"><i class="fas fa-key"></i> لایسنس‌ها</button>
-<button class="tab" onclick="showTab('invoices', this)"><i class="fas fa-receipt"></i> فاکتورها</button>
+<div class="info-item">
+<div class="label">📦 محصول</div>
+<div class="value" id="infoProduct">—</div>
 </div>
-
-<!-- PANEL: LICENSES -->
-<div id="p-licenses" class="panel active card">
-<h3 style="color:#4f9eff;margin-bottom:1rem"><i class="fas fa-key"></i> لایسنس‌های شما</h3>
-<div id="licenses-list"><div class="empty">در حال بارگذاری...</div></div>
+<div class="info-item">
+<div class="label">⏱️ روزهای مانده</div>
+<div class="value" id="infoDays">—</div>
 </div>
-
-<!-- PANEL: INVOICES -->
-<div id="p-invoices" class="panel card">
-<h3 style="color:#4f9eff;margin-bottom:1rem"><i class="fas fa-receipt"></i> فاکتورهای شما</h3>
-<div id="invoices-list"><div class="empty">در حال بارگذاری...</div></div>
-</div>
-
+<div class="info-item">
+<div class="label">📅 تاریخ انقضا</div>
+<div class="value" id="infoExpires">—</div>
 </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div style="margin-top:20px">
+<div style="color:#8fa2dc;font-size:.8rem;margin-bottom:6px">📊 مصرف تراکنش‌ها</div>
+<div class="progress">
+<div class="progress-bar" id="volBar" style="width:0%"></div>
+<div class="progress-text" id="volText">۰ از ۰</div>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:.75rem;color:#8fa2dc">
+<span>مصرف‌شده: <b id="volUsed" style="color:#facc15">۰</b></span>
+<span>باقیمانده: <b id="volRemaining" style="color:#4ade80">۰</b></span>
+</div>
+</div>
+
+<div id="sigInfo" class="mono" style="display:none"></div>
+
+<button class="btn btn-gray" onclick="logout()" style="margin-top:15px">🚪 خروج</button>
+</div>
+
+<!-- Expired / Renewal -->
+<div class="card" id="renewCard" style="display:none;border-color:rgba(239,68,68,.4)">
+<h2 style="color:#ef4444">⏰ لایسنس منقضی شده</h2>
+<p style="color:#cbd5e1;font-size:.85rem;line-height:1.8;margin-bottom:15px">
+لایسنس شما به پایان رسیده است. برای تمدید با پشتیبانی تماس بگیرید و لایسنس جدید را دریافت کنید.
+</p>
+<div class="info-grid">
+<div class="info-item" style="border-right-color:#ef4444">
+<div class="label">تاریخ انقضا</div>
+<div class="value err" id="expiredDate">—</div>
+</div>
+<div class="info-item" style="border-right-color:#ef4444">
+<div class="label">روزهای گذشته</div>
+<div class="value err" id="expiredDays">—</div>
+</div>
+</div>
+<button class="btn btn-red" onclick="logout()" style="margin-top:15px">🚪 خروج</button>
+</div>
+
+<div style="text-align:center;color:#475569;font-size:.75rem;margin-top:30px">
+Horizon Core © ۲۰۲۶ · Customer Panel v2.0
+</div>
+
+</div>
 
 <script>
-var SWITCH_URL = 'http://localhost:8080';
-var token = null;
-var customer = null;
+var $ = function(id){ return document.getElementById(id); };
+var PUBKEY = localStorage.getItem('hz_pubkey') || '';
 
-function toast(msg, type) {
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast ' + (type || '');
-    t.style.display = 'block';
-    setTimeout(function() { t.style.display = 'none'; }, 3500);
+// ═══════════════════════════════════════════════
+// Public key management
+// ═══════════════════════════════════════════════
+function savePubkey() {
+  var v = $('pubkey').value.trim();
+  if (!v) { setStatus('pubkeyStatus', 'err', '❌ کلید را وارد کنید'); return; }
+  if (v.indexOf('0x') === 0) v = v.substring(2);
+  if (v.length !== 130) {
+    setStatus('pubkeyStatus', 'err', '❌ طول کلید عمومی باید ۱۳۰ کاراکتر باشه (الان: ' + v.length + ')');
+    return;
+  }
+  PUBKEY = v;
+  localStorage.setItem('hz_pubkey', v);
+  setStatus('pubkeyStatus', 'ok', '✅ کلید عمومی ذخیره شد');
+  showLogin();
 }
 
-function api(path, opts) {
-    opts = opts || {};
-    opts.headers = Object.assign({
-        'Content-Type': 'application/json',
-        'X-Customer-Token': token
-    }, opts.headers || {});
-    return hzFetch(path, opts).then(function(r) {
-        return r.json().then(function(d) { return { ok: r.ok, data: d }; });
-    });
+function showPubkeyInfo() {
+  var info = $('pubkeyInfo');
+  info.style.display = 'block';
+  info.textContent = '📍 Public Key: 0x' + PUBKEY;
 }
 
-// ============ LOGIN ============
-function doLogin() {
-    var cid = document.getElementById('cust-id').value.trim();
-    var pass = document.getElementById('cust-pass').value.trim();
-    var st = document.getElementById('login-status');
-
-    if (!cid || !pass) {
-        st.innerHTML = '<span style="color:#f87171">❌ شناسه و رمز را وارد کنید</span>';
-        return;
-    }
-
-    st.innerHTML = '⏳ در حال بررسی...';
-
-    hzFetch('/api/v1/customer/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({customer_id: cid, password: pass})
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-        if (d.status === 'ok') {
-            token = d.token;
-            customer = {id: d.customer_id, name: d.name, type: d.type};
-            localStorage.setItem('hz_customer_token', token);
-            localStorage.setItem('hz_customer_data', JSON.stringify(customer));
-            st.innerHTML = '<span style="color:#4ade80">✅ ورود موفق</span>';
-            setTimeout(showDash, 400);
-        } else {
-            st.innerHTML = '<span style="color:#f87171">❌ ' + (d.error || 'خطا') + '</span>';
-        }
-    })
-    .catch(function(e) {
-        st.innerHTML = '<span style="color:#f87171">❌ ' + e.message + '</span>';
-    });
+// ═══════════════════════════════════════════════
+// Status helper
+// ═══════════════════════════════════════════════
+function setStatus(id, type, msg) {
+  var el = $(id);
+  el.className = 'status ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
 }
 
-function doLogout() {
-    if (!confirm('خارج می‌شوید؟')) return;
-    if (token) {
-        hzFetch('/api/v1/customer/logout', {
-            method: 'POST',
-            headers: {'X-Customer-Token': token}
-        }).catch(function() {});
-    }
-    localStorage.removeItem('hz_customer_token');
-    localStorage.removeItem('hz_customer_data');
-    location.reload();
+// ═══════════════════════════════════════════════
+// UI switching
+// ═══════════════════════════════════════════════
+function showLogin() {
+  $('setupCard').style.display = 'none';
+  $('loginCard').style.display = 'block';
 }
 
-function showDash() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dash').style.display = 'block';
-    document.getElementById('cust-name').textContent = customer.name || customer.id;
-    document.getElementById('cust-id-show').textContent = customer.id;
-    document.getElementById('cust-type-show').textContent = customer.type;
-    loadAll();
-    setInterval(loadAll, 30000);
+function showSetup() {
+  $('setupCard').style.display = 'block';
+  $('loginCard').style.display = 'none';
+  $('infoCard').style.display = 'none';
+  $('renewCard').style.display = 'none';
+  $('pubkey').value = '0x' + PUBKEY;
+  if (PUBKEY) showPubkeyInfo();
 }
 
-// ============ TABS ============
-function showTab(name, btn) {
-    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-    document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
-    btn.classList.add('active');
-    document.getElementById('p-' + name).classList.add('active');
-    if (name === 'licenses') loadLicenses();
-    if (name === 'invoices') loadInvoices();
+function switchMode(m) {
+  if (m === 'file') {
+    $('tabFile').classList.add('active');
+    $('tabPaste').classList.remove('active');
+    $('modeFile').style.display = 'block';
+    $('modePaste').style.display = 'none';
+  } else {
+    $('tabFile').classList.remove('active');
+    $('tabPaste').classList.add('active');
+    $('modeFile').style.display = 'none';
+    $('modePaste').style.display = 'block';
+  }
 }
 
-// ============ LOAD ============
-function loadAll() {
-    loadLicenses();
-    loadInvoices();
+// ═══════════════════════════════════════════════
+// Import public key to CryptoKey
+// ═══════════════════════════════════════════════
+async function importPubkey() {
+  if (!PUBKEY || PUBKEY.length !== 130) {
+    throw new Error('کلید عمومی نامعتبر');
+  }
+  var bytes = new Uint8Array(65);
+  for (var i = 0; i < 65; i++) {
+    bytes[i] = parseInt(PUBKEY.substr(i*2, 2), 16);
+  }
+  return await crypto.subtle.importKey(
+    'raw', bytes,
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    true, ['verify']
+  );
 }
 
-function loadLicenses() {
-    hzFetch('/api/v1/customer/licenses').then(function(res) {
-        var d = res.data;
-        var el = document.getElementById('licenses-list');
-        var list = (d.licenses || []);
+// ═══════════════════════════════════════════════
+// Verify license signature
+// ═══════════════════════════════════════════════
+async function verifyLicense(lic) {
+  var pub = await importPubkey();
 
-        document.getElementById('s-licenses').textContent = list.length;
-        document.getElementById('s-active').textContent = list.filter(function(l) {
-            return l.status === 'active' && !(l.grace && l.grace.is_read_only);
-        }).length;
+  // Canonical message — must match server & signer
+  var expDate = new Date(lic.expires_at * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z');
+  var msg = lic.license_id + '|' + lic.product_id + '|' + lic.user_id + '|' + lic.volume + '|' + (lic.merkle_root || '') + '|' + lic.status + '|' + expDate;
 
-        if (list.length === 0) {
-            el.innerHTML = '<div class="empty">هنوز لایسنسی ندارید</div>';
-            return;
-        }
+  var msgBytes = new TextEncoder().encode(msg);
 
-        var html = '';
-        list.forEach(function(l) {
-            var cls = 'lic-card';
-            var badge = '<span class="badge active">✅ فعال</span>';
-            var grace = l.grace || {};
+  // Signature is 64 bytes (r+s) in hex
+  var sigBytes = new Uint8Array(64);
+  for (var i = 0; i < 64; i++) {
+    sigBytes[i] = parseInt(lic.signature.substr(i*2, 2), 16);
+  }
 
-            if (grace.is_read_only) {
-                cls += ' expired';
-                badge = '<span class="badge expired">❌ منقضی</span>';
-            } else if (grace.in_grace_period) {
-                cls += ' grace';
-                badge = '<span class="badge grace">⚠️ در Grace</span>';
-            }
+  var valid = await crypto.subtle.verify(
+    { name: 'ECDSA', hash: 'SHA-256' },
+    pub,
+    sigBytes,
+    msgBytes
+  );
 
-            var days = l.days_remaining;
-            var daysColor = days > 30 ? '#4ade80' : (days > 0 ? '#facc15' : '#f87171');
-
-            html += '<div class="' + cls + '">';
-            html += '<div class="row"><span class="lbl">شناسه</span><span class="val">' + l.license_id + '</span></div>';
-            html += '<div class="row"><span class="lbl">محصول</span><span class="val">' + l.product_id + '</span></div>';
-            html += '<div class="row"><span class="lbl">حجم</span><span class="val">' + (l.volume||0).toLocaleString('fa-IR') + '</span></div>';
-            html += '<div class="row"><span class="lbl">مصرف</span><span class="val">' + (l.used||0) + '</span></div>';
-            html += '<div class="row"><span class="lbl">روزهای مانده</span><span class="val" style="color:' + daysColor + '">' + days + '</span></div>';
-            html += '<div class="row"><span class="lbl">انقضا</span><span class="val">' + new Date(l.expires_at * 1000).toLocaleDateString('fa-IR') + '</span></div>';
-            html += '<div class="row"><span class="lbl">وضعیت</span><span>' + badge + '</span></div>';
-            html += '<div class="actions">';
-            html += '<button class="btn btn-sm btn-green" onclick="renewLicense(\'' + l.license_id + '\')"><i class="fas fa-rotate"></i> تمدید</button>';
-            html += '<a class="btn btn-sm btn-outline" href="' + SWITCH_URL + '/api/v1/customer/license/download/' + l.license_id + '?token=' + token + '" target="_blank" onclick="event.preventDefault(); downloadLicense(\'' + l.license_id + '\');"><i class="fas fa-download"></i> دانلود .lic</a>';
-            html += '</div>';
-            html += '</div>';
-        });
-        el.innerHTML = html;
-    }).catch(function() {
-        document.getElementById('licenses-list').innerHTML = '<div class="empty" style="color:#f87171">خطا در بارگذاری</div>';
-    });
+  return valid;
 }
 
-function loadInvoices() {
-    hzFetch('/api/v1/customer/invoices').then(function(res) {
-        var d = res.data;
-        var el = document.getElementById('invoices-list');
-        var list = (d.invoices || []);
-
-        document.getElementById('s-invoices').textContent = list.length;
-        document.getElementById('s-paid').textContent = list.filter(function(i) { return i.status === 'paid'; }).length;
-
-        if (list.length === 0) {
-            el.innerHTML = '<div class="empty">هنوز فاکتوری ندارید</div>';
-            return;
-        }
-
-        var html = '<table class="tbl"><thead><tr>';
-        html += '<th>شناسه فاکتور</th><th>لایسنس</th><th>مبلغ (تومان)</th><th>وضعیت</th><th>تاریخ</th>';
-        html += '</tr></thead><tbody>';
-
-        list.forEach(function(inv) {
-            var badge = inv.status === 'paid'
-                ? '<span class="badge paid">✅ پرداخت‌شده</span>'
-                : (inv.status === 'pending'
-                    ? '<span class="badge pending">⏳ در انتظار</span>'
-                    : '<span class="badge expired">' + inv.status + '</span>');
-
-            html += '<tr>';
-            html += '<td style="font-family:monospace;font-size:.7rem">' + inv.invoice_id + '</td>';
-            html += '<td style="font-family:monospace;font-size:.7rem">' + inv.license_id + '</td>';
-            html += '<td style="color:#4ade80;font-weight:700">' + (inv.amount_irr||0).toLocaleString('fa-IR') + '</td>';
-            html += '<td>' + badge + '</td>';
-            html += '<td style="font-size:.75rem">' + new Date(inv.created_at).toLocaleString('fa-IR') + '</td>';
-            html += '</tr>';
-        });
-
-        html += '</tbody></table>';
-        el.innerHTML = html;
-    }).catch(function() {
-        document.getElementById('invoices-list').innerHTML = '<div class="empty" style="color:#f87171">خطا در بارگذاری</div>';
-    });
-}
-
-// ============ ACTIONS ============
-function renewLicense(licenseID) {
-    var hours = prompt('چند ساعت تمدید؟ (پیش‌فرض: 8760 = 1 سال)', '8760');
-    if (hours === null) return;
-
-    hours = parseInt(hours);
-    if (!hours || hours <= 0) {
-        toast('مدت نامعتبر', 'error');
-        return;
-    }
-
-    hzFetch('/api/v1/customer/license/renew/' + licenseID, {
-        method: 'POST',
-        body: JSON.stringify({duration_hours: hours})
-    }).then(function(res) {
-        if (!res.ok) {
-            toast('خطا: ' + (res.data.error || ''), 'error');
-            return;
-        }
-        var d = res.data;
-        var amount = (d.amount_toman || 0).toLocaleString('fa-IR');
-        if (confirm('فاکتور به مبلغ ' + amount + ' تومان ساخته شد.\n\nبرای پرداخت (Mock) به صفحه پرداخت منتقل می‌شوید؟')) {
-            window.location.href = SWITCH_URL + d.redirect_url;
-        }
-        loadAll();
-    }).catch(function(e) {
-        toast('خطا: ' + e.message, 'error');
-    });
-}
-
-function downloadLicense(licenseID) {
-    hzFetch('/api/v1/customer/license/download/' + licenseID, {
-        headers: {'X-Customer-Token': token}
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-        if (d.error) {
-            toast('خطا: ' + d.error, 'error');
-            return;
-        }
-        var blob = new Blob([JSON.stringify(d, null, 2)], {type: 'application/json'});
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = licenseID + '.lic';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        toast('✅ فایل دانلود شد', 'success');
-    })
-    .catch(function(e) {
-        toast('خطا: ' + e.message, 'error');
-    });
-}
-
-// ============ AUTO-LOGIN ============
-window.addEventListener('DOMContentLoaded', function() {
-    var saved = localStorage.getItem('hz_customer_token');
-    var savedData = localStorage.getItem('hz_customer_data');
-    if (saved && savedData) {
-        token = saved;
-        customer = JSON.parse(savedData);
-        // Validate token
-        hzFetch('/api/v1/customer/me').then(function(res) {
-            if (res.ok) {
-                showDash();
-            } else {
-                localStorage.removeItem('hz_customer_token');
-                localStorage.removeItem('hz_customer_data');
-            }
-        }).catch(function() {});
-    }
+// ═══════════════════════════════════════════════
+// File picker
+// ═══════════════════════════════════════════════
+$('licFile').addEventListener('change', async function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  try {
+    var text = await file.text();
+    var lic = JSON.parse(text);
+    await processLicense(lic);
+  } catch(err) {
+    setStatus('loginStatus', 'err', '❌ خطا: ' + (err.message || err));
+  }
 });
+
+// ═══════════════════════════════════════════════
+// Paste login
+// ═══════════════════════════════════════════════
+async function loginPaste() {
+  var uid = $('pasteUserId').value.trim();
+  var sig = $('pasteSignature').value.trim().replace(/^0x/, '');
+  if (!uid || !sig) {
+    setStatus('loginStatus', 'err', '❌ هر دو فیلد لازم است');
+    return;
+  }
+  // We can't fully verify with just uid+sig, need volume etc.
+  // Show a message asking to upload the .lic file instead
+  setStatus('loginStatus', 'warn', '⚠️ برای پیست دستی، فایل .lic کامل لازم است. لطفاً از حالت آپلود استفاده کنید.');
+}
+
+// ═══════════════════════════════════════════════
+// Process license
+// ═══════════════════════════════════════════════
+async function processLicense(lic) {
+  setStatus('loginStatus', 'info', '⏳ در حال اعتبارسنجی امضا...');
+
+  try {
+    // 1. Check required fields
+    var required = ['license_id', 'user_id', 'product_id', 'volume', 'signature', 'issued_at', 'expires_at', 'status'];
+    for (var i = 0; i < required.length; i++) {
+      if (lic[required[i]] === undefined) {
+        throw new Error('فیلد ' + required[i] + ' در لایسنس نیست');
+      }
+    }
+
+    // 2. Verify signature
+    var valid = await verifyLicense(lic);
+    if (!valid) {
+      setStatus('loginStatus', 'err', '❌ امضای لایسنس معتبر نیست');
+      return;
+    }
+
+    setStatus('loginStatus', 'ok', '✅ لایسنس معتبر است');
+    setTimeout(function() { showLicense(lic); }, 400);
+  } catch(err) {
+    setStatus('loginStatus', 'err', '❌ خطا: ' + (err.message || err));
+  }
+}
+
+// ═══════════════════════════════════════════════
+// Display license
+// ═══════════════════════════════════════════════
+function showLicense(lic) {
+  $('loginCard').style.display = 'none';
+
+  var now = Math.floor(Date.now() / 1000);
+  var daysLeft = Math.floor((lic.expires_at - now) / 86400);
+  var expired = daysLeft < 0;
+
+  if (expired) {
+    // Show renewal card
+    $('renewCard').style.display = 'block';
+    $('expiredDate').textContent = new Date(lic.expires_at * 1000).toLocaleDateString('fa-IR');
+    $('expiredDays').textContent = Math.abs(daysLeft) + ' روز';
+    return;
+  }
+
+  // Show normal info card
+  $('infoCard').style.display = 'block';
+  $('licId').textContent = lic.license_id;
+  $('infoUser').textContent = lic.user_id;
+  $('infoProduct').textContent = lic.product_id;
+  $('infoDays').textContent = daysLeft + ' روز';
+  $('infoDays').className = 'value' + (daysLeft < 30 ? ' warn' : '');
+  $('infoExpires').textContent = new Date(lic.expires_at * 1000).toLocaleDateString('fa-IR');
+
+  // Volume progress
+  var used = lic.used || 0;
+  var total = lic.volume;
+  var pct = Math.min(100, Math.round(used / total * 100));
+  var remaining = total - used;
+
+  $('volBar').style.width = pct + '%';
+  $('volBar').className = 'progress-bar' + (pct > 90 ? ' err' : (pct > 70 ? ' warn' : ''));
+  $('volText').textContent = pct + '%';
+  $('volUsed').textContent = used.toLocaleString();
+  $('volRemaining').textContent = remaining.toLocaleString();
+
+  // Status badge
+  var badge = $('statusBadge');
+  if (daysLeft < 30) {
+    badge.textContent = 'نزدیک انقضا';
+    badge.className = 'badge warn';
+  } else {
+    badge.textContent = 'فعال';
+    badge.className = 'badge';
+  }
+
+  // Signature info
+  var sig = $('sigInfo');
+  sig.style.display = 'block';
+  sig.textContent = '🔐 Signature: ' + lic.signature.substring(0, 32) + '...';
+}
+
+// ═══════════════════════════════════════════════
+// Logout
+// ═══════════════════════════════════════════════
+function logout() {
+  $('infoCard').style.display = 'none';
+  $('renewCard').style.display = 'none';
+  $('loginCard').style.display = 'block';
+  $('licFile').value = '';
+  $('pasteUserId').value = '';
+  $('pasteSignature').value = '';
+  $('loginStatus').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════
+if (PUBKEY && PUBKEY.length === 130) {
+  showLogin();
+} else {
+  showSetup();
+}
 </script>
 </body>
 </html>
