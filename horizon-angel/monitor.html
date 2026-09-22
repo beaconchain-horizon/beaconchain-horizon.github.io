@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Horizon Angel — Security Operations Center</title>
+<title>Horizon Angel — SOC</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -10,7 +10,7 @@
     font-family: 'Consolas','Courier New',monospace;
     height: 100vh; overflow: hidden;
     display: grid;
-    grid-template-columns: 260px 1fr 360px;
+    grid-template-columns: 260px 1fr 400px;
     grid-template-rows: 48px 1fr 220px;
     grid-template-areas: "top top top" "left center right" "bottom bottom bottom";
     gap: 1px; background-color: #0a1a1f;
@@ -25,22 +25,27 @@
   #center { grid-area: center; position: relative; }
   #right { grid-area: right; display: flex; flex-direction: column; }
   #bottom { grid-area: bottom; display: flex; flex-direction: column; }
-
   .logo { font-size: 15px; font-weight: bold; letter-spacing: 2px; }
   .logo span { color: #ff3860; }
   .stat { font-size: 11px; color: #4a8b7a; }
   .stat b { color: #7ef2c4; font-weight: normal; }
   .stat.warn b { color: #ffb700; }
   .stat.danger b { color: #ff3860; }
+  .stat.online b { color: #7ef2c4; }
+  .stat.offline b { color: #ff3860; }
   .clock { margin-right: auto; font-size: 12px; color: #4a8b7a; }
-
   .panel-title {
     padding: 10px 14px; font-size: 11px; color: #4a8b7a;
     letter-spacing: 2px; border-bottom: 1px solid #143b32;
     background: #0a161c; flex-shrink:0;
+    display:flex; justify-content:space-between; align-items:center;
   }
-
-  /* LEFT — industries */
+  .panel-title .dot-conn {
+    width:7px; height:7px; border-radius:50%;
+    background:#4a8b7a; box-shadow:0 0 6px #4a8b7a;
+  }
+  .panel-title .dot-conn.live { background:#7ef2c4; box-shadow:0 0 8px #7ef2c4; }
+  .panel-title .dot-conn.err  { background:#ff3860; box-shadow:0 0 8px #ff3860; }
   #industry-list { flex:1; overflow-y:auto; }
   .ind-item {
     padding: 9px 14px; font-size: 11px;
@@ -54,8 +59,6 @@
   .ind-item .dot.r { background:#ff3860; box-shadow:0 0 8px #ff3860; animation: pulse 1s infinite; }
   @keyframes pulse { 50% { opacity: .35; } }
   .ind-item span.count { color:#4a8b7a; font-size:10px; }
-
-  /* CENTER — radar */
   #radar-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
   #radar { width: min(88%, 640px); aspect-ratio: 1; position: relative; }
   .radar-ring {
@@ -99,18 +102,21 @@
     transform: translate(-50%, 18px);
     font-size: 10px; color: #ff3860; letter-spacing: 1px; white-space:nowrap;
   }
-
-  /* RIGHT — chat + offline license */
   #chat-log {
     flex: 1; overflow-y: auto; padding: 12px;
     font-size: 12px; line-height: 1.7;
   }
-  .msg { margin-bottom: 12px; }
+  .msg { margin-bottom: 12px; white-space: pre-wrap; }
   .msg.user { color: #7ef2c4; }
   .msg.user::before { content: '> '; color: #ff3860; }
   .msg.angel { color: #b8e0d2; }
   .msg.angel::before { content: '◆ ANGEL: '; color: #ffb700; font-weight: bold; }
   .msg.system { color: #4a8b7a; font-style: italic; font-size: 11px; }
+  .msg.error { color: #ff3860; font-size: 11px; }
+  .cursor-blink::after {
+    content: '▊'; color: #7ef2c4; animation: blink 1s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
   #chat-input-wrap {
     border-top: 1px solid #143b32; padding: 8px;
     display: flex; gap: 6px; background: #0a161c; flex-shrink:0;
@@ -126,16 +132,13 @@
     padding: 0 16px; cursor: pointer; font-family: inherit; font-size: 12px;
   }
   #chat-send:hover { background: #1a4d42; }
-
-  /* Bottom streams */
+  #chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
   #streams { display: grid; grid-template-columns: repeat(4,1fr); gap:1px; flex:1; background:#0a1a1f; }
   .stream { background:#080f14; padding:10px 14px; font-size:11px; overflow:hidden; position:relative; }
   .stream-title { color:#4a8b7a; letter-spacing:1px; margin-bottom:6px; font-size:10px; }
   .stream-line { color:#7ef2c4; line-height:1.6; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .stream-line.danger { color:#ff3860; }
   .stream-line.warn { color:#ffb700; }
-
-  /* Offline License mini-panel */
   #offline-btn {
     background:#0a161c; border:1px solid #143b32; color:#7ef2c4;
     padding:8px 12px; margin:8px; font-family:inherit; font-size:11px;
@@ -150,7 +153,7 @@
   #offline-panel.open { display:block; }
   #offline-panel h2 { color:#7ef2c4; font-size:14px; letter-spacing:2px; margin-bottom:20px; }
   #offline-panel label { display:block; color:#4a8b7a; font-size:11px; margin: 10px 0 4px; }
-  #offline-panel input, #offline-panel select, #offline-panel textarea {
+  #offline-panel input, #offline-panel select {
     background:#05080d; border:1px solid #143b32; color:#7ef2c4;
     padding:8px 12px; font-family:inherit; font-size:12px;
     outline:none; width:100%; max-width:560px;
@@ -179,12 +182,12 @@
 
 <div id="top" class="panel">
   <div class="logo">◆ HORIZON <span>/</span> ANGEL AI</div>
-  <div class="stat">AGENTS <b id="agent-count">144</b></div>
-  <div class="stat">ACTIVE <b id="agent-active">37</b></div>
+  <div class="stat" id="mode-stat">MODE <b id="mode">DEMO</b></div>
+  <div class="stat" id="conn-stat">LINK <b id="conn">--</b></div>
+  <div class="stat">AGENTS <b>144</b></div>
   <div class="stat warn">ALERTS <b id="alert-count">3</b></div>
   <div class="stat danger">THREATS <b id="threat-count">1</b></div>
   <div class="stat">TPS <b id="tps">31,113</b></div>
-  <div class="stat">UPTIME <b>99.98%</b></div>
   <div class="clock" id="clock">--:--:--</div>
 </div>
 
@@ -213,10 +216,12 @@
 </div>
 
 <div id="right" class="panel">
-  <div class="panel-title">▸ ANGEL AI / DIRECT CHANNEL</div>
+  <div class="panel-title">
+    <span>▸ ANGEL AI / DIRECT</span>
+    <span class="dot-conn" id="conn-dot"></span>
+  </div>
   <div id="chat-log">
-    <div class="msg system">اتصال به 144 ایجنت برقرار شد...</div>
-    <div class="msg angel">سلام مهدی. من Angel AI هستم. 144 ایجنت زیر نظر من آماده‌ی فرمان تو هستن. چی بررسی کنم؟</div>
+    <div class="msg system">راه‌اندازی Angel AI ...</div>
   </div>
   <div id="chat-input-wrap">
     <input id="chat-input" placeholder="فرمان بده..." autocomplete="off">
@@ -245,7 +250,6 @@
   </div>
 </div>
 
-<!-- OFFLINE LICENSE PANEL -->
 <div id="offline-panel">
   <button class="close" id="offline-close">× بستن</button>
   <h2>◆ OFFLINE LICENSE — USB + ECDSA</h2>
@@ -255,21 +259,28 @@
   <input id="lic-id" placeholder="HZ-2026-XXXX">
   <label>سطح لایسنس</label>
   <select id="lic-tier">
-    <option>Standard</option>
-    <option>Professional</option>
-    <option>Enterprise</option>
-    <option>Sovereign</option>
+    <option>Standard</option><option>Professional</option>
+    <option>Enterprise</option><option>Sovereign</option>
   </select>
   <label>مدت (روز)</label>
   <input id="lic-days" type="number" value="365">
-  <label>توکن USB (Private Key Stub)</label>
-  <input id="lic-usb" placeholder="USB://KEYSTORE" value="USB://KEYSTORE">
+  <label>توکن USB</label>
+  <input id="lic-usb" value="USB://KEYSTORE">
   <button id="lic-issue">◆ تولید لایسنس و امضای ECDSA</button>
   <div class="out" id="lic-out">آماده برای تولید لایسنس...</div>
 </div>
 
+<script src="config.js"></script>
+<script src="config.local.js" onerror="console.log('config.local.js not found, using demo mode')"></script>
 <script>
-// TARGETS
+const CFG = window.ANGEL_CONFIG || {};
+const MODE = (new URLSearchParams(location.search).get('mode')) || CFG.mode || 'demo';
+const IS_LIVE = MODE === 'live' && CFG.apiKey && !CFG.apiKey.startsWith('YOUR_');
+
+document.getElementById('mode').textContent = IS_LIVE ? 'LIVE' : 'DEMO';
+document.getElementById('mode-stat').classList.toggle('online', IS_LIVE);
+
+// ============ TARGETS ============
 const industries = [
   { name: 'نفت و گاز',  count: 42, status: 'r' },
   { name: 'مس',         count: 18, status: 'g' },
@@ -290,7 +301,6 @@ const industries = [
   { name: 'شرکت مخابرات',  count: 210, status: 'y' },
   { name: 'راه‌آهن',       count: 180, status: 'g' },
 ];
-
 const listEl = document.getElementById('industry-list');
 industries.forEach(i => {
   const el = document.createElement('div');
@@ -303,33 +313,27 @@ industries.forEach(i => {
   listEl.appendChild(el);
 });
 
-// RADAR BLIPS
+// ============ RADAR ============
 const blipTypes = [
-  { c:'',  l:'شعبه OK' },
-  { c:'',  l:'سنسور OK' },
-  { c:'',  l:'validator OK' },
-  { c:'y', l:'هشدار شبکه' },
-  { c:'y', l:'تأخیر سنسور' },
-  { c:'r', l:'نشتی گاز' },
-  { c:'r', l:'عدم تطابق لایسنس' },
-  { c:'r', l:'قطع ارتباط' },
+  { c:'',  l:'شعبه OK' }, { c:'',  l:'سنسور OK' }, { c:'',  l:'validator OK' },
+  { c:'y', l:'هشدار شبکه' }, { c:'y', l:'تأخیر سنسور' },
+  { c:'r', l:'نشتی گاز' }, { c:'r', l:'عدم تطابق لایسنس' }, { c:'r', l:'قطع ارتباط' },
 ];
 const blipsEl = document.getElementById('blips');
 function addBlip() {
   const a = Math.random() * Math.PI * 2;
   const r = Math.sqrt(Math.random()) * 46;
-  const x = 50 + Math.cos(a) * r;
-  const y = 50 + Math.sin(a) * r;
-  const t = blipTypes[Math.floor(Math.random()*blipTypes.length)];
   const b = document.createElement('div');
+  const t = blipTypes[Math.floor(Math.random()*blipTypes.length)];
   b.className = 'blip ' + t.c;
-  b.style.left = x + '%'; b.style.top = y + '%';
+  b.style.left = (50 + Math.cos(a)*r) + '%';
+  b.style.top  = (50 + Math.sin(a)*r) + '%';
   b.dataset.label = t.l + ' — ' + Math.floor(Math.random()*10000);
   blipsEl.appendChild(b);
 }
 for (let i = 0; i < 60; i++) addBlip();
 
-// STREAMS
+// ============ STREAMS ============
 function logLine(el, text, cls = '') {
   const d = document.createElement('div');
   d.className = 'stream-line ' + cls;
@@ -345,61 +349,167 @@ setInterval(()=>logLine(netS, `val #${Math.floor(Math.random()*9999)} → ${(Mat
 setInterval(()=>logLine(rfS,  `FM ${(88+Math.random()*20).toFixed(1)} MHz — sig ${(Math.random()*100).toFixed(0)}%`),1200);
 setInterval(()=>{
   const c = ['OK','OK','WARN','OK','OK','ERR'][Math.floor(Math.random()*6)];
-  logLine(senS, `sensor-${Math.floor(Math.random()*500)} → ${c}`,
-    c==='ERR'?'danger':c==='WARN'?'warn':'');
+  logLine(senS, `sensor-${Math.floor(Math.random()*500)} → ${c}`, c==='ERR'?'danger':c==='WARN'?'warn':'');
 },700);
 const threats = ['port scan','anomaly val-042','RF jamming 91.4','unusual API','Merkle mismatch','gas leak HZ-0192'];
 setInterval(()=>{
-  if (Math.random()<0.4) {
-    logLine(thrS, '⚠ '+threats[Math.floor(Math.random()*threats.length)], 'danger');
-  }
+  if (Math.random()<0.4) logLine(thrS, '⚠ '+threats[Math.floor(Math.random()*threats.length)], 'danger');
 },3000);
 
-// CLOCK
+// ============ CLOCK / TPS ============
 setInterval(()=>{
   document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB');
 },1000);
-
-// TPS
 setInterval(()=>{
   document.getElementById('tps').textContent = (31000+Math.floor(Math.random()*1200)).toLocaleString();
 },2000);
 
-// CHAT
+// ============ CHAT ============
 const chatLog = document.getElementById('chat-log');
 const chatInput = document.getElementById('chat-input');
-const responses = {
-  'map':   'نقشه بارگذاری شد. 60 نقطه فعال. 8 هشدار، 3 آلارم قرمز.',
-  'threat':'تهدید فعال: نشتی گاز در صنعت نفت — تیم emergency در حال بررسی.',
-  'agent': '144 ایجنت آنلاین. 37 در حال کار، بقیه آماده.',
-  'status':'همه سرویس‌ها فعال. TPS: 31,113. آپ‌تایم: 99.98%.',
-  'scan':  'اسکن آغاز شد... 18 صنعت، 16 بانک، 12,000+ شعبه.',
-  'help':  'فرمان‌ها: map, scan, threat, status, agent, help',
-  'بانک':  'وضعیت بانک‌ها: 16 بانک فعال، 2 هشدار، 1 آلارم قرمز (بانک سپه).',
-  'نفت':   'صنعت نفت: 42 سایت فعال، 1 نشتی گاز، 3 هشدار تأخیر سنسور.',
-};
-function reply(text) {
-  const t = text.toLowerCase();
-  let r = 'دستور ثبت شد. تیم مربوطه در حال اجراست.';
-  for (const k in responses) if (t.includes(k)) { r = responses[k]; break; }
-  setTimeout(()=>{
-    const d = document.createElement('div');
-    d.className = 'msg angel'; d.textContent = r;
-    chatLog.appendChild(d); chatLog.scrollTop = chatLog.scrollHeight;
-  }, 500);
-}
-function send() {
-  const v = chatInput.value.trim(); if (!v) return;
-  const u = document.createElement('div');
-  u.className = 'msg user'; u.textContent = v;
-  chatLog.appendChild(u); chatInput.value='';
-  chatLog.scrollTop = chatLog.scrollHeight;
-  reply(v);
-}
-document.getElementById('chat-send').onclick = send;
-chatInput.addEventListener('keydown', e => { if (e.key==='Enter') send(); });
+const chatSend = document.getElementById('chat-send');
+const connEl = document.getElementById('conn');
+const connDot = document.getElementById('conn-dot');
 
-// OFFLINE LICENSE
+const SYSTEM_PROMPT = `تو Angel AI هستی — مغز متفکر و ارکستریتور 144 ایجنت تخصصی در اکوسیستم امنیتی Horizon.
+مالک تو مهدی آملی‌مقدم است. تو در پنل SOC Horizon کار می‌کنی و وظیفه‌ات:
+- رصد صنایع، بانک‌ها، شعبات، سنسورها
+- تحلیل تهدیدها و آلارم‌ها
+- هماهنگی 144 ایجنت تخصصی
+- گزارش‌دهی به زبان فارسی، دقیق، فنی، بدون تعارف
+پاسخ‌ها کوتاه، فنی، عملیاتی. از ایموجی و تعارف پرهیز کن.`;
+
+let history = [{ role: 'system', content: SYSTEM_PROMPT }];
+
+function addMsg(role, text) {
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  d.textContent = text;
+  chatLog.appendChild(d);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  return d;
+}
+
+async function askAngel(userText) {
+  addMsg('user', userText);
+  history.push({ role: 'user', content: userText });
+
+  if (!IS_LIVE) {
+    // DEMO mode
+    const r = demoReply(userText);
+    await new Promise(res => setTimeout(res, 400));
+    addMsg('angel', r);
+    history.push({ role: 'assistant', content: r });
+    return;
+  }
+
+  // LIVE mode — streaming
+  chatSend.disabled = true;
+  const el = addMsg('angel', '');
+  el.classList.add('cursor-blink');
+  let full = '';
+  try {
+    const res = await fetch(`${CFG.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CFG.apiKey}`
+      },
+      body: JSON.stringify({
+        model: CFG.model,
+        messages: history,
+        stream: true,
+        temperature: 0.7
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        const t = line.trim();
+        if (!t.startsWith('data:')) continue;
+        const payload = t.slice(5).trim();
+        if (payload === '[DONE]') continue;
+        try {
+          const j = JSON.parse(payload);
+          const c = j.choices?.[0]?.delta?.content || '';
+          if (c) {
+            full += c;
+            el.textContent = full;
+            chatLog.scrollTop = chatLog.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+    el.classList.remove('cursor-blink');
+    history.push({ role: 'assistant', content: full });
+    connEl.textContent = 'OK';
+  } catch(e) {
+    el.classList.remove('cursor-blink');
+    el.classList.add('error');
+    el.textContent = 'خطا در اتصال: ' + e.message;
+    connEl.textContent = 'ERR';
+    connDot.className = 'dot-conn err';
+  } finally {
+    chatSend.disabled = false;
+  }
+}
+
+function demoReply(t) {
+  const s = t.toLowerCase();
+  const map = [
+    ['بانک',  'وضعیت بانک‌ها: 16 بانک فعال. 2 هشدار زرد (صادرات، پارسیان). 1 آلارم قرمز (بانک سپه — قطع ارتباط با 12 شعبه).'],
+    ['نفت',   'صنعت نفت: 42 سایت فعال. 1 نشتی گاز (HZ-0192). 3 تأخیر سنسور.'],
+    ['مس',    'صنعت مس: 18 سایت فعال. همه سبز. لایسنس‌ها معتبر.'],
+    ['سیمان', 'صنعت سیمان: 24 سایت. 2 هشدار ترافیک غیرعادی.'],
+    ['threat','تهدید فعال: port scan روی شعبه بانک ملی. تیم red-team در حال بررسی.'],
+    ['scan',  'اسکن کامل آغاز شد... 18 صنعت، 16 بانک، 12000+ شعبه، 4800 سنسور.'],
+    ['status','همه سرویس‌ها فعال. TPS: 31,113. آپ‌تایم 99.98%. 144 ایجنت آنلاین.'],
+    ['agent', '144 ایجنت آنلاین. 37 در حال کار، 12 idle، بقیه آماده.'],
+    ['help',  'فرمان‌ها: بانک | نفت | مس | سیمان | scan | threat | status | agent'],
+  ];
+  for (const [k, v] of map) if (s.includes(k)) return v;
+  return 'دستور ثبت شد. تیم مربوطه در حال اجراست. جزئیات بیشتر؟';
+}
+
+function send() {
+  const v = chatInput.value.trim();
+  if (!v) return;
+  chatInput.value = '';
+  askAngel(v);
+}
+chatSend.onclick = send;
+chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+// ============ INIT ============
+if (IS_LIVE) {
+  connEl.textContent = 'CONNECTING';
+  // health check
+  fetch(`${CFG.baseUrl}/models`, {
+    headers: { 'Authorization': `Bearer ${CFG.apiKey}` }
+  }).then(r => {
+    if (r.ok) { connEl.textContent = 'OK'; connDot.className = 'dot-conn live'; }
+    else { connEl.textContent = 'ERR ' + r.status; connDot.className = 'dot-conn err'; }
+  }).catch(e => {
+    connEl.textContent = 'ERR';
+    connDot.className = 'dot-conn err';
+  });
+  addMsg('system', 'حالت LIVE — اتصال به Angel AI روی Liara');
+  addMsg('angel', 'سلام مهدی. Angel AI فعاله. 144 ایجنت آماده. چی بررسی کنم؟');
+} else {
+  connEl.textContent = 'DEMO';
+  addMsg('system', 'حالت DEMO — داده‌ها شبیه‌سازی. برای LIVE: ?mode=live با config.local.js');
+  addMsg('angel', 'سلام مهدی. در حالت DEMO هستم. برای اتصال واقعی، config.local.js رو بساز و ?mode=live اضافه کن.');
+}
+
+// ============ OFFLINE LICENSE ============
 const offPanel = document.getElementById('offline-panel');
 document.getElementById('offline-btn').onclick = () => offPanel.classList.add('open');
 document.getElementById('offline-close').onclick = () => offPanel.classList.remove('open');
@@ -410,23 +520,14 @@ document.getElementById('lic-issue').onclick = () => {
   const days = document.getElementById('lic-days').value;
   const usb  = document.getElementById('lic-usb').value;
   const out  = document.getElementById('lic-out');
-  out.textContent = '◆ در حال خواندن کلید از ' + usb + ' ...\n';
+  out.textContent = '◆ خواندن کلید از ' + usb + ' ...\n';
   setTimeout(()=>{
-    out.textContent += '◆ کلید خصوصی خوانده شد (stub — روی USB می‌مونه)\n';
-    out.textContent += '◆ محاسبه Merkle proof ...\n';
-    out.textContent += '◆ امضای ECDSA روی payload ...\n';
-    out.textContent += '◆ هش SHA-256 ...\n\n';
-    out.textContent += 'LICENSE GENERATED\n';
-    out.textContent += '─────────────────────────\n';
-    out.textContent += 'Customer : ' + cust + '\n';
-    out.textContent += 'License  : ' + id + '\n';
-    out.textContent += 'Tier     : ' + tier + '\n';
-    out.textContent += 'Days     : ' + days + '\n';
-    out.textContent += 'KeySrc   : ' + usb + '\n';
+    out.textContent += '◆ کلید خصوصی خوانده شد (stub)\n◆ محاسبه Merkle proof ...\n◆ امضای ECDSA ...\n◆ SHA-256 ...\n\n';
+    out.textContent += 'LICENSE GENERATED\n─────────────────────────\n';
+    out.textContent += 'Customer : ' + cust + '\nLicense  : ' + id + '\nTier     : ' + tier + '\nDays     : ' + days + '\nKeySrc   : ' + usb + '\n';
     out.textContent += 'Sig      : 0x' + Array.from({length:32},()=>Math.floor(Math.random()*16).toString(16)).join('') + '\n';
     out.textContent += 'Merkle   : 0x' + Array.from({length:32},()=>Math.floor(Math.random()*16).toString(16)).join('') + '\n';
-    out.textContent += '─────────────────────────\n';
-    out.textContent += '✓ آماده برای ذخیره روی USB';
+    out.textContent += '─────────────────────────\n✓ آماده ذخیره روی USB';
   }, 800);
 };
 </script>
