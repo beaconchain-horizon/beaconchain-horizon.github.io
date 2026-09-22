@@ -133,6 +133,7 @@ async function hzFetch(path, opts) {
 <button class="tab active" onclick="showTab('overview',event)"><i class="fas fa-chart-line"></i> وضعیت</button>
 <button class="tab" onclick="showTab('licenses',event)"><i class="fas fa-key"></i> لایسنس‌ها</button>
 <button class="tab" onclick="showTab('blockchain',event)"><i class="fas fa-cubes"></i> بلاکچین</button>
+<button class="tab" onclick="showTab('offline',event)"><i class="fas fa-usb"></i> لایسنس آفلاین</button>
 </div>
 
 <!-- ===== TAB: OVERVIEW ===== -->
@@ -191,6 +192,69 @@ async function hzFetch(path, opts) {
 
 </div>
 
+<!-- ===== TAB: OFFLINE LICENSE ===== -->
+<div class="tc" id="tab-offline">
+
+<div class="card" style="border-right:4px solid #facc15">
+<h3>🔐 لایسنس آفلاین از USB</h3>
+<p style="color:#facc15;font-size:.75rem;margin-bottom:1rem">⚠️ این بخش کاملاً آفلاین کار می‌کند — کلید خصوصی فقط از USB خوانده می‌شود و هرگز ذخیره نمی‌شود.</p>
+
+<div style="background:rgba(79,158,255,.08);border-radius:10px;padding:15px;margin-bottom:15px;border-right:3px solid #4f9eff">
+<div style="color:#4f9eff;font-weight:700;margin-bottom:10px">۱. لود کلید خصوصی از USB</div>
+<label for="usbKeyFile" style="display:block;padding:20px;border:2px dashed rgba(79,158,255,.4);border-radius:10px;text-align:center;cursor:pointer;color:#4f9eff">
+📁 کلیک کن یا فایل کلید را از USB انتخاب کن
+<input type="file" id="usbKeyFile" accept=".pem,.key,.txt,.hex,.json" style="display:none">
+</label>
+<div id="usbKeyStatus" class="out"></div>
+<div id="usbKeyInfo" style="display:none;background:rgba(0,0,0,.4);padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:.7rem;color:#8fa2dc;word-break:break-all;direction:ltr;text-align:left"></div>
+</div>
+
+<div style="background:rgba(192,132,252,.08);border-radius:10px;padding:15px;margin-bottom:15px;border-right:3px solid #c084fc">
+<div style="color:#c084fc;font-weight:700;margin-bottom:10px">۲. اطلاعات لایسنس</div>
+<div class="grid">
+<div class="fg"><label>🆔 شناسه لایسنس</label><input type="text" id="offLicId" value="HORIZON-GOLD-001"></div>
+<div class="fg"><label>🏦 مشتری</label>
+<select id="offUserId">
+<option value="bank-markazi">بانک مرکزی ایران</option>
+<option value="bank-melli">بانک ملی ایران</option>
+<option value="bank-saderat">بانک صادرات ایران</option>
+<option value="bank-mellat">بانک ملت</option>
+<option value="bank-sepeh">بانک سپه</option>
+<option value="nioc">شرکت ملی نفت ایران</option>
+<option value="nigc">شرکت ملی گاز ایران</option>
+<option value="tavanir">مدیریت شبکه برق</option>
+<option value="msc">فولاد مبارکه</option>
+<option value="nicico">صنایع مس ایران</option>
+<option value="custom">دستی وارد کن...</option>
+</select></div>
+<div class="fg"><label>📦 شناسه محصول</label><input type="text" id="offProductId" value="horizon-core"></div>
+<div class="fg"><label>📊 حجم (تراکنش)</label>
+<select id="offVolume">
+<option value="1000000">۱ میلیون — برنزی</option>
+<option value="10000000">۱۰ میلیون — نقره‌ای</option>
+<option value="50000000" selected>۵۰ میلیون — طلایی</option>
+<option value="500000000">۵۰۰ میلیون — سازمانی</option>
+<option value="custom">دستی...</option>
+</select></div>
+<div class="fg"><label>⏱️ مدت (روز)</label><input type="number" id="offDuration" value="365"></div>
+<div class="fg"><label>🔒 Hardware ID (اختیاری)</label><input type="text" id="offHwid" placeholder="خالی = آزاد"></div>
+</div>
+<input type="text" id="offCustomUser" placeholder="نام مشتری دستی" style="display:none;margin-top:.5rem">
+<input type="number" id="offCustomVolume" placeholder="حجم دلخواه" style="display:none;margin-top:.5rem">
+</div>
+
+<button class="btn btn-green" id="offGenBtn" disabled style="width:100%;padding:14px;font-size:1rem"><i class="fas fa-signature"></i> 🔐 تولید لایسنس با ECDSA</button>
+<div id="offGenStatus" class="out"></div>
+
+<div id="offResultBox" style="display:none;margin-top:15px">
+<div style="color:#4ade80;font-weight:700;margin-bottom:8px">۳. نتیجه</div>
+<button class="btn btn-green" id="offDlBtn" style="width:100%"><i class="fas fa-download"></i> 💾 دانلود فایل لایسنس (.lic)</button>
+<pre id="offResult" style="background:rgba(0,0,0,.5);padding:15px;border-radius:8px;margin-top:10px;font-family:monospace;font-size:.7rem;color:#4ade80;max-height:300px;overflow:auto;direction:ltr;text-align:left;white-space:pre-wrap"></pre>
+</div>
+
+</div>
+
+<!-- ===== TAB: LICENSES ===== -->
 <!-- ===== TAB: LICENSES ===== -->
 <div class="tc" id="tab-licenses">
 <div class="card">
@@ -312,6 +376,138 @@ function showDash(){
     if(window.hzInterval) clearInterval(window.hzInterval);
     window.hzInterval=setInterval(loadAll,10000);
 }
+
+
+// ═══════════════════════════════════════════════
+// OFFLINE LICENSE — USB-based ECDSA signing
+// ═══════════════════════════════════════════════
+var offPrivateKey = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+  var f = document.getElementById('usbKeyFile');
+  if (f) f.addEventListener('change', async function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    try { await offLoadKey(await file.text(), file.name); }
+    catch(err) { offStatus('usbKeyStatus','err','❌ خطا: '+(err.message||err)); }
+  });
+
+  var uid = document.getElementById('offUserId');
+  if (uid) uid.addEventListener('change', function(e) {
+    document.getElementById('offCustomUser').style.display = e.target.value==='custom'?'block':'none';
+  });
+  var vol = document.getElementById('offVolume');
+  if (vol) vol.addEventListener('change', function(e) {
+    document.getElementById('offCustomVolume').style.display = e.target.value==='custom'?'block':'none';
+  });
+
+  var gb = document.getElementById('offGenBtn');
+  if (gb) gb.addEventListener('click', offGenerate);
+  var db = document.getElementById('offDlBtn');
+  if (db) db.addEventListener('click', offDownload);
+});
+
+function offStatus(id, type, msg) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display='block';
+  el.style.padding='12px';
+  el.style.borderRadius='8px';
+  el.style.marginTop='10px';
+  el.style.fontSize='.85rem';
+  el.style.textAlign='center';
+  if (type==='ok'){el.style.background='rgba(74,222,128,.15)';el.style.border='1px solid #4ade80';el.style.color='#4ade80';}
+  else if (type==='err'){el.style.background='rgba(239,68,68,.15)';el.style.border='1px solid #ef4444';el.style.color='#ef4444';}
+  else{el.style.background='rgba(79,158,255,.15)';el.style.border='1px solid #4f9eff';el.style.color='#4f9eff';}
+  el.textContent=msg;
+}
+
+async function offLoadKey(content, filename) {
+  offStatus('usbKeyStatus','info','⏳ در حال پردازش کلید...');
+  content = content.trim();
+  if (content.charAt(0)==='{') {
+    try { var j=JSON.parse(content); content=(j.private_key||j.key||j.privateKey||'').trim(); } catch(e){}
+  }
+  content = content.replace(/^["']+|["']+$/g,'').trim();
+  var rawKey, format='';
+  if (content.indexOf('-----BEGIN')!==-1) {
+    format='PEM';
+    var b64=content.replace(/-----[^-]+-----/g,'').replace(/\s/g,'');
+    rawKey=Uint8Array.from(atob(b64),function(c){return c.charCodeAt(0);});
+  } else {
+    var hex=content.replace(/^0x/i,'').replace(/[^0-9a-fA-F]/g,'');
+    if (hex.length===64) {
+      format='HEX-32';
+      rawKey=new Uint8Array(32);
+      for (var i=0;i<32;i++) rawKey[i]=parseInt(hex.substr(i*2,2),16);
+    } else throw new Error('طول hex = '+hex.length+' (باید ۶۴ باشه)');
+  }
+  try {
+    var prefix = new Uint8Array([
+      0x30,0x41,0x02,0x01,0x00,0x30,0x13,0x06,0x07,
+      0x2a,0x86,0x48,0xce,0x3d,0x02,0x01,0x06,0x08,
+      0x2a,0x86,0x48,0xce,0x3d,0x03,0x01,0x07,0x04,
+      0x27,0x30,0x25,0x02,0x01,0x01,0x04,0x20
+    ]);
+    var pkcs8=new Uint8Array(prefix.length+32);
+    pkcs8.set(prefix,0);
+    pkcs8.set(rawKey.slice(0,32),prefix.length);
+    offPrivateKey=await crypto.subtle.importKey('pkcs8',pkcs8,{name:'ECDSA',namedCurve:'P-256'},true,['sign']);
+    var jwk=await crypto.subtle.exportKey('jwk',offPrivateKey);
+    function b2b(s){return Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),function(c){return c.charCodeAt(0);});}
+    var xb=b2b(jwk.x), yb=b2b(jwk.y);
+    var pub=new Uint8Array(1+xb.length+yb.length);
+    pub[0]=0x04; pub.set(xb,1); pub.set(yb,1+xb.length);
+    var pubHex='0x'+Array.from(pub).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+    var info=document.getElementById('usbKeyInfo');
+    info.style.display='block';
+    info.textContent='📄 File: '+filename+'\n🔑 Format: '+format+'\n📍 Public Key: '+pubHex;
+    offStatus('usbKeyStatus','ok','✅ کلید بارگذاری شد ('+format+')');
+    document.getElementById('offGenBtn').disabled=false;
+  } catch(err) {
+    offStatus('usbKeyStatus','err','❌ خطا: '+(err.message||err.name||err));
+  }
+}
+
+async function offGenerate() {
+  if (!offPrivateKey) { offStatus('offGenStatus','err','❌ اول کلید را بارگذاری کن'); return; }
+  try {
+    offStatus('offGenStatus','info','⏳ در حال امضا...');
+    var licId=document.getElementById('offLicId').value.trim();
+    var userId=document.getElementById('offUserId').value==='custom'?document.getElementById('offCustomUser').value.trim():document.getElementById('offUserId').value;
+    var productId=document.getElementById('offProductId').value.trim();
+    var volume=document.getElementById('offVolume').value==='custom'?parseInt(document.getElementById('offCustomVolume').value):parseInt(document.getElementById('offVolume').value);
+    var duration=parseInt(document.getElementById('offDuration').value);
+    var hwid=document.getElementById('offHwid').value.trim();
+    if (!licId||!userId||!productId||!volume||!duration) throw new Error('همه فیلدها را پر کن');
+    var issuedAt=Math.floor(Date.now()/1000);
+    var expiresAt=issuedAt+(duration*86400);
+    var merkleRoot='', status='active';
+    var expDate=new Date(expiresAt*1000).toISOString().replace(/\.\d{3}Z$/,'Z');
+    var msg=licId+'|'+productId+'|'+userId+'|'+volume+'|'+merkleRoot+'|'+status+'|'+expDate;
+    var sig=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},offPrivateKey,new TextEncoder().encode(msg));
+    var sigHex=Array.from(new Uint8Array(sig)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+    var license={id:0,license_id:licId,user_id:userId,product_id:productId,volume:volume,used:0,duration:duration,signature:sigHex,merkle_root:merkleRoot,issued_at:issuedAt,expires_at:expiresAt,status:status,hardware_id:hwid};
+    document.getElementById('offResultBox').style.display='block';
+    document.getElementById('offResult').textContent=JSON.stringify(license,null,2);
+    offStatus('offGenStatus','ok','✅ لایسنس با موفقیت تولید شد');
+  } catch(err) {
+    offStatus('offGenStatus','err','❌ خطا: '+(err.message||err.name||err));
+  }
+}
+
+function offDownload() {
+  var content=document.getElementById('offResult').textContent;
+  if (!content) return;
+  var licId=document.getElementById('offLicId').value.trim();
+  var blob=new Blob([content],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download=licId+'.lic'; a.click();
+  URL.revokeObjectURL(url);
+  offStatus('offGenStatus','ok','💾 فایل دانلود شد: '+licId+'.lic');
+}
+
 
 function logout(){
     if(confirm('از پنل خارج می‌شوید؟ (کلید شما ذخیره خواهد ماند)')){
