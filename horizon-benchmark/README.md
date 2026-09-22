@@ -20,7 +20,7 @@ cd beaconchain-horizon.github.io/horizon-benchmark
 
 | Metric | Value |
 |---|---|
-| Peak TPS | 34,115 |
+| Peak TPS | 31,113 |
 | Errors | 0 |
 | Tampering | 0 |
 | ECDSA Sign | < 1 ms |
