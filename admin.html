@@ -182,7 +182,7 @@ async function hzFetch(path, opts) {
 <h3>🔐 اطلاعات امنیتی شما</h3>
 <div style="font-size:.8rem;color:#cbd5e1;line-height:1.9">
 <div><strong>آدرس عمومی اتریوم:</strong></div>
-<div style="font-family:monospace;color:#4ade80;background:rgba(0,0,0,.3);padding:.5rem;border-radius:.5rem;margin:.3rem 0;word-break:break-all">0x0000000000000000000000000000000000000000</div>
+<div style="font-family:monospace;color:#4ade80;background:rgba(0,0,0,.3);padding:.5rem;border-radius:.5rem;margin:.3rem 0;word-break:break-all">0x4E94F10F0a34a0DF229e68d5902644046258D678</div>
 <div style="margin-top:1rem"><strong>امضای ثابت (Signature):</strong></div>
 <div style="font-family:monospace;color:#c084fc;background:rgba(0,0,0,.3);padding:.5rem;border-radius:.5rem;margin:.3rem 0;font-size:.7rem;word-break:break-all">0x0a91d71af46d7cab4e0658a7002bc4e3b36a544aa29f5028b1d6a9e57063ed777dc483a36dc9d72c343fb846318517b2b9e4b8beab18f8dc3b4cf5b84be223831b</div>
 <div style="margin-top:1rem"><strong>آدرس بیت‌کوین:</strong></div>
@@ -282,10 +282,10 @@ async function hzFetch(path, opts) {
 </div>
 
 <script>
-const API='https://beaconchain-horizon.github.io';
+const API = 'http://localhost:8080';
 const SW = 'http://localhost:8080'; // multi-source via hzFetch
 const PASSWORD='raQLGlGdlQZTDq5ToAOo';
-const PUBLIC_ADDR='0x0000000000000000000000000000000000000000';
+const PUBLIC_ADDR='0x4E94F10F0a34a0DF229e68d5902644046258D678';
 const SIGNATURE='0x0a91d71af46d7cab4e0658a7002bc4e3b36a544aa29f5028b1d6a9e57063ed777dc483a36dc9d72c343fb846318517b2b9e4b8beab18f8dc3b4cf5b84be223831b';
 
 // ============ TAB SWITCHING ============
@@ -662,16 +662,16 @@ async function loadTPS(){
             document.getElementById('s3').textContent='خطا';
         }
     } catch(e){
-        document.getElementById('s3').textContent='قطع';
+        document.getElementById('s3').textContent='آفلاین';
     }
 }
 
 async function loadServerStatus(){
     try{
         const r=await hzFetch('/api/v1/health');
-        document.getElementById('s4').textContent=r.ok?'✅ آنلاین':'❌ قطع';
+        document.getElementById('s4').textContent=r.ok?'✅ آنلاین':'🔌 آفلاین';
     } catch(e){
-        document.getElementById('s4').textContent='❌ قطع';
+        document.getElementById('s4').textContent='🔌 آفلاین';
     }
 }
 
