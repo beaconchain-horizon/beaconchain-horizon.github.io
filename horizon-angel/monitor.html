@@ -194,7 +194,8 @@
 <div id="left" class="panel">
   <div class="panel-title">▸ TARGETS / صنایع و بانک‌ها</div>
   <div id="industry-list"></div>
-  <button id="offline-btn">◆ پنل لایسنس آفلاین</button>
+  <button id="agent-btn" style="background:#0a161c;border:1px solid #c084fc;color:#c084fc;padding:8px 12px;margin:0 8px 8px;font-family:inherit;font-size:11px;cursor:pointer;letter-spacing:1px;width:calc(100% - 16px)">◆ اجرای ایجنت</button>
+<button id="offline-btn">◆ پنل لایسنس آفلاین</button>
 </div>
 
 <div id="center" class="panel">
@@ -224,9 +225,13 @@
     <div class="msg system">راه‌اندازی Angel AI ...</div>
   </div>
   <div id="chat-input-wrap">
+    <button id="chat-file-btn" title="آپلود فایل" style="padding:0 10px;background:#143b32;border:none;color:#7ef2c4;cursor:pointer;font-size:14px">📎</button>
+    <button id="chat-mic-btn" title="ضبط صدا" style="padding:0 10px;background:#143b32;border:none;color:#7ef2c4;cursor:pointer;font-size:14px">🎤</button>
+    <input type="file" id="chat-file-input" style="display:none" multiple>
     <input id="chat-input" placeholder="فرمان بده..." autocomplete="off">
     <button id="chat-send">ارسال</button>
   </div>
+  <div id="chat-file-preview" style="font-size:10px;color:#7ef2c4;padding:4px 8px;display:none;background:#0a161c;border-top:1px solid #143b32"></div>
 </div>
 
 <div id="bottom" class="panel">
@@ -513,23 +518,145 @@ if (IS_LIVE) {
 const offPanel = document.getElementById('offline-panel');
 document.getElementById('offline-btn').onclick = () => offPanel.classList.add('open');
 document.getElementById('offline-close').onclick = () => offPanel.classList.remove('open');
-document.getElementById('lic-issue').onclick = () => {
-  const cust = document.getElementById('lic-customer').value || 'UNKNOWN';
-  const id   = document.getElementById('lic-id').value || ('HZ-' + Date.now());
-  const tier = document.getElementById('lic-tier').value;
-  const days = document.getElementById('lic-days').value;
-  const usb  = document.getElementById('lic-usb').value;
-  const out  = document.getElementById('lic-out');
-  out.textContent = '◆ خواندن کلید از ' + usb + ' ...\n';
-  setTimeout(()=>{
-    out.textContent += '◆ کلید خصوصی خوانده شد (stub)\n◆ محاسبه Merkle proof ...\n◆ امضای ECDSA ...\n◆ SHA-256 ...\n\n';
-    out.textContent += 'LICENSE GENERATED\n─────────────────────────\n';
-    out.textContent += 'Customer : ' + cust + '\nLicense  : ' + id + '\nTier     : ' + tier + '\nDays     : ' + days + '\nKeySrc   : ' + usb + '\n';
-    out.textContent += 'Sig      : 0x' + Array.from({length:32},()=>Math.floor(Math.random()*16).toString(16)).join('') + '\n';
-    out.textContent += 'Merkle   : 0x' + Array.from({length:32},()=>Math.floor(Math.random()*16).toString(16)).join('') + '\n';
-    out.textContent += '─────────────────────────\n✓ آماده ذخیره روی USB';
-  }, 800);
-};
+/* mockup removed */
 </script>
+<script src="offline-fallback.js">
+
+// ==================== HORIZON LICENSE + CHAT (REAL) ====================
+const _P={p:BigInt('0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff'),a:BigInt('0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc'),Gx:BigInt('0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296'),Gy:BigInt('0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5')};
+const _m=(a,m)=>((a%m)+m)%m;
+function _inv(a,m){let[o,r]=[a,m],[os,s]=[1n,0n];while(r!==0n){const q=o/r;[o,r]=[r,o-q*r];[os,s]=[s,os-q*s];}return _m(os,m);}
+function _add(P,Q){if(!P)return Q;if(!Q)return P;const[x1,y1]=P,[x2,y2]=Q;if(x1===x2&&_m(y1+y2,_P.p)===0n)return null;let l;if(x1===x2&&y1===y2)l=_m((3n*x1*x1+_P.a)*_inv(2n*y1,_P.p),_P.p);else l=_m((y2-y1)*_inv(x2-x1,_P.p),_P.p);const x3=_m(l*l-x1-x2,_P.p);return[x3,_m(l*(x1-x3)-y1,_P.p)];}
+function _mul(k,P){let R=null,Q=P;while(k>0n){if(k&1n)R=_add(R,Q);Q=_add(Q,Q);k>>=1n;}return R;}
+const _h2b=h=>{const b=new Uint8Array(h.length/2);for(let i=0;i<h.length;i+=2)b[i/2]=parseInt(h.substr(i,2),16);return b;};
+const _b2h=b=>Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+function _pub(h){const d=BigInt('0x'+h);const[x,y]=_mul(d,[_P.Gx,_P.Gy]);return x.toString(16).padStart(64,'0')+y.toString(16).padStart(64,'0');}
+function _pkcs8(h){const raw=_h2b(h),pub=_h2b('04'+_pub(h));const o=new Uint8Array(138);let i=0;o[i++]=0x30;o[i++]=0x81;o[i++]=0x87;o[i++]=0x02;o[i++]=0x01;o[i++]=0x00;o[i++]=0x30;o[i++]=0x13;o[i++]=0x06;o[i++]=0x07;o[i++]=0x2a;o[i++]=0x86;o[i++]=0x48;o[i++]=0xce;o[i++]=0x3d;o[i++]=0x02;o[i++]=0x01;o[i++]=0x06;o[i++]=0x08;o[i++]=0x2a;o[i++]=0x86;o[i++]=0x48;o[i++]=0xce;o[i++]=0x3d;o[i++]=0x03;o[i++]=0x01;o[i++]=0x07;o[i++]=0x04;o[i++]=0x6d;o[i++]=0x30;o[i++]=0x6b;o[i++]=0x02;o[i++]=0x01;o[i++]=0x01;o[i++]=0x04;o[i++]=0x20;o.set(raw,i);i+=32;o[i++]=0xa1;o[i++]=0x44;o[i++]=0x03;o[i++]=0x42;o[i++]=0x00;o.set(pub,i);return o;}
+
+let _priv=null,_pubHex=null;
+
+document.addEventListener('DOMContentLoaded',function(){
+  const ub=document.getElementById('lic-usb-btn');
+  const uf=document.getElementById('lic-usb-file');
+  if(ub&&uf){
+    ub.onclick=()=>uf.click();
+    uf.onchange=async(e)=>{
+      const f=e.target.files[0];if(!f)return;
+      const st=document.getElementById('lic-usb-status');
+      const t=(await f.text()).trim();
+      let kh=null;
+      if(/^[0-9a-fA-F]{64}$/.test(t))kh=t;
+      else{try{const j=JSON.parse(t);if(j.private_key)kh=j.private_key;else if(j.key)kh=j.key;}catch(_){}}
+      if(!kh){st.innerHTML='❌ فرمت ناشناخته';st.style.color='#ff3860';return;}
+      try{
+        _priv=await crypto.subtle.importKey('pkcs8',_pkcs8(kh),{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
+        _pubHex=_pub(kh);
+        st.innerHTML='✅ کلید بارگذاری شد<br>📄 '+f.name+'<br>📍 0x'+_pubHex.substring(0,32)+'...';
+        st.style.color='#4ade80';
+      }catch(err){st.innerHTML='❌ '+err.message;st.style.color='#ff3860';}
+    };
+  }
+
+  const cp=document.getElementById('lic-copy');
+  if(cp){
+    cp.onclick=()=>{
+      const s=document.getElementById('lic-customer');if(!s.value)return;
+      navigator.clipboard.writeText('🏦 '+s.options[s.selectedIndex].text+'
+🆔 '+s.value+'
+📅 '+new Date().toISOString());
+      const b=document.getElementById('lic-copy');b.textContent='✅';setTimeout(()=>b.textContent='📋 کپی',1500);
+    };
+  }
+
+  const cs=document.getElementById('lic-customer');
+  if(cs&&cs.tagName==='SELECT'){
+    cs.onchange=(e)=>{
+      const p=document.getElementById('lic-customer-preview');
+      if(!e.target.value){p.style.display='none';return;}
+      p.style.display='block';
+      p.innerHTML='📋 '+e.target.options[e.target.selectedIndex].text+' — <span style="color:#7ef2c4">'+e.target.value+'</span>';
+    };
+  }
+
+  const li=document.getElementById('lic-issue');
+  if(li){
+    li.onclick=async()=>{
+      const out=document.getElementById('lic-out');
+      const cust=document.getElementById('lic-customer').value;
+      const id=document.getElementById('lic-id').value||('HZ-'+Date.now());
+      const tier=document.getElementById('lic-tier').value;
+      const days=parseInt(document.getElementById('lic-days').value);
+      if(!cust){out.textContent='❌ مشتری انتخاب نشده';return;}
+      if(!_priv){out.textContent='❌ کلید USB بارگذاری نشده';return;}
+      out.textContent='◆ امضای ECDSA ...';
+      const now=Math.floor(Date.now()/1000);
+      const p={license_id:id,user_id:cust,product_id:'horizon-core',volume:0,used:0,duration:days,issued_at:now,expires_at:now+days*86400,status:'active',hardware_id:''};
+      const msg=JSON.stringify(p,Object.keys(p).sort());
+      const sig=await crypto.subtle.sign({name:'ECDSA',hash:'SHA-256'},_priv,new TextEncoder().encode(msg));
+      const sigHex=_b2h(new Uint8Array(sig));
+      const lic=Object.assign({},p,{tier:tier,signature:sigHex,merkle_root:'',public_key:'0x04'+_pubHex});
+      out.textContent='LICENSE GENERATED\n─────────────────────────\nCustomer : '+cust+'\nLicense  : '+id+'\nTier     : '+tier+'\nDays     : '+days+'\nSig      : 0x'+sigHex.substring(0,64)+'...\n─────────────────────────\n✓ آماده دانلود';
+      const blob=new Blob([JSON.stringify(lic,null,2)],{type:'application/json'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=id+'.lic';a.click();
+    };
+  }
+
+  // Chat file + mic
+  let _files=[];
+  const fb=document.getElementById('chat-file-btn');
+  const fi=document.getElementById('chat-file-input');
+  if(fb&&fi){
+    fb.onclick=()=>fi.click();
+    fi.onchange=(e)=>{
+      for(const f of e.target.files)_files.push(f);
+      const p=document.getElementById('chat-file-preview');
+      p.style.display='block';
+      p.textContent='📎 '+_files.map(f=>f.name).join(', ');
+    };
+  }
+  let _rec=null,_chunks=[];
+  const mb=document.getElementById('chat-mic-btn');
+  if(mb){
+    mb.onclick=async()=>{
+      if(_rec&&_rec.state==='recording'){_rec.stop();mb.textContent='🎤';mb.style.background='#143b32';return;}
+      try{
+        const s=await navigator.mediaDevices.getUserMedia({audio:true});
+        _rec=new MediaRecorder(s);_chunks=[];
+        _rec.ondataavailable=e=>_chunks.push(e.data);
+        _rec.onstop=()=>{
+          const blob=new Blob(_chunks,{type:'audio/webm'});
+          s.getTracks().forEach(t=>t.stop());
+          const p=document.getElementById('chat-file-preview');
+          p.style.display='block';
+          p.textContent='🎤 صدا ضبط شد ('+(blob.size/1024).toFixed(1)+'KB)';
+          _files.push(new File([blob],'voice.webm',{type:'audio/webm'}));
+        };
+        _rec.start();mb.textContent='⏹';mb.style.background='#ff3860';
+      }catch(e){alert('میکروفون: '+e.message);}
+    };
+  }
+});
+
+</script>
+
+<div id="agent-panel" style="display:none;position:fixed;inset:0;background:rgba(5,8,13,.97);z-index:102;padding:40px;overflow-y:auto">
+  <button id="agent-close" style="position:absolute;top:20px;left:20px;background:transparent;border:1px solid #ff3860;color:#ff3860;padding:6px 14px;cursor:pointer;font-size:11px">× بستن</button>
+  <h2 style="color:#c084fc;font-size:15px;letter-spacing:2px;margin-bottom:20px">◆ اجرای ایجنت روی مخازن</h2>
+  <div style="max-width:900px">
+    <label style="display:block;color:#4a8b7a;font-size:11px;margin:12px 0 4px">مخزن</label>
+    <select id="ag-repo" style="width:100%;background:#05080d;border:1px solid #143b32;color:#7ef2c4;padding:8px 12px;font-family:inherit;font-size:12px">
+      <option value="horizon-core">horizon-core</option>
+      <option value="horizon-core-engine">horizon-core-engine</option>
+      <option value="agency-agents">agency-agents</option>
+    </select>
+    <label style="display:block;color:#4a8b7a;font-size:11px;margin:12px 0 4px">نام ایجنت</label>
+    <input id="ag-name" placeholder="backend-architect" style="width:100%;background:#05080d;border:1px solid #143b32;color:#7ef2c4;padding:8px 12px;font-family:inherit;font-size:12px">
+    <label style="display:block;color:#4a8b7a;font-size:11px;margin:12px 0 4px">دستور</label>
+    <textarea id="ag-task" placeholder="این مخزن رو بررسی کن و ۳ فیکس مشخص بده" style="width:100%;height:100px;background:#05080d;border:1px solid #143b32;color:#7ef2c4;padding:8px 12px;font-family:inherit;font-size:12px;resize:vertical"></textarea>
+    <button id="ag-run" style="margin-top:16px;background:#143b32;color:#7ef2c4;border:none;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:12px">▶ اجرا</button>
+    <div id="ag-out" style="margin-top:16px;padding:14px;background:#05080d;border:1px solid #143b32;color:#7ef2c4;font-size:11px;white-space:pre-wrap;max-height:400px;overflow-y:auto;min-height:80px">آماده...</div>
+  </div>
+</div>
+
 </body>
 </html>
