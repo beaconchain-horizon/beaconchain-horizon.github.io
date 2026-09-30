@@ -295,15 +295,15 @@ const industries = [
   { name: 'پتروشیمی',   count: 27, status: 'g' },
   { name: 'فولاد',      count: 19, status: 'y' },
   { name: 'برق و نیروگاه', count: 56, status: 'g' },
-  { name: 'بانک ملی',   count: 1872, status: 'g' },
-  { name: 'بانک صادرات',count: 1450, status: 'y' },
-  { name: 'بانک ملت',   count: 1290, status: 'g' },
-  { name: 'بانک تجارت', count: 1080, status: 'g' },
-  { name: 'بانک سپه',   count: 940, status: 'r' },
-  { name: 'بانک پاسارگاد', count: 620, status: 'g' },
-  { name: 'بانک پارسیان',  count: 480, status: 'g' },
-  { name: 'بیمه ایران',    count: 320, status: 'g' },
-  { name: 'شرکت مخابرات',  count: 210, status: 'y' },
+  { name: 'بانکداری — نمونه A',   count: 1872, status: 'g' },
+  { name: 'بانکداری — نمونه B',count: 1450, status: 'y' },
+  { name: 'بانکداری — نمونه C',   count: 1290, status: 'g' },
+  { name: 'بانکداری — نمونه D', count: 1080, status: 'g' },
+  { name: 'بانکداری — نمونه E',   count: 940, status: 'r' },
+  { name: 'بانکداری — نمونه F', count: 620, status: 'g' },
+  { name: 'بانکداری — نمونه G',  count: 480, status: 'g' },
+  { name: 'بیمه',    count: 320, status: 'g' },
+  { name: 'مخابرات',  count: 210, status: 'y' },
   { name: 'راه‌آهن',       count: 180, status: 'g' },
 ];
 const listEl = document.getElementById('industry-list');
@@ -470,13 +470,13 @@ async function askAngel(userText) {
 function demoReply(t) {
   const s = t.toLowerCase();
   const map = [
-    ['بانک',  'وضعیت بانک‌ها: 16 بانک فعال. 2 هشدار زرد (صادرات، پارسیان). 1 آلارم قرمز (بانک سپه — قطع ارتباط با 12 شعبه).'],
+    ['بانک',  'وضعیت بانک‌ها: 16 سازمان نمونه فعال. 2 هشدار زرد. 1 آلارم قرمز (قطع ارتباط با 12 شعبه).'],
     ['نفت',   'صنعت نفت: 42 سایت فعال. 1 نشتی گاز (HZ-0192). 3 تأخیر سنسور.'],
     ['مس',    'صنعت مس: 18 سایت فعال. همه سبز. لایسنس‌ها معتبر.'],
     ['سیمان', 'صنعت سیمان: 24 سایت. 2 هشدار ترافیک غیرعادی.'],
-    ['threat','تهدید فعال: port scan روی شعبه بانک ملی. تیم red-team در حال بررسی.'],
+    ['threat','تهدید فعال: port scan روی سازمان نمونه. تیم red-team در حال بررسی.'],
     ['scan',  'اسکن کامل آغاز شد... 18 صنعت، 16 بانک، 12000+ شعبه، 4800 سنسور.'],
-    ['status','همه سرویس‌ها فعال. TPS: 35,938. آپ‌تایم 99.98%. 144 ایجنت آنلاین.'],
+    ['status','همه سرویس‌ها فعال. TPS: 35,938. تست امنیتی: 192/192. 144 ایجنت آنلاین.'],
     ['agent', '144 ایجنت آنلاین. 37 در حال کار، 12 idle، بقیه آماده.'],
     ['help',  'فرمان‌ها: بانک | نفت | مس | سیمان | scan | threat | status | agent'],
   ];
