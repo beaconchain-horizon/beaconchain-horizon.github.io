@@ -464,7 +464,7 @@ footer .logo .mark{
     <div class="section-head">
       <div class="eyebrow">ویژگی‌ها</div>
       <h2>ساخته‌شده برای سخت‌ترین شرایط</h2>
-      <p>زیرساختی که برای محیط‌های حیاتی طراحی شده — از بانکداری تا صنایع سنگین.</p>
+      <p>زیرساختی که برای محیط‌های حیاتی طراحی شده — از بانک مرکزی تا صنایع سنگین.</p>
     </div>
     <div class="feat-grid">
       <div class="feat-card">
@@ -650,22 +650,22 @@ footer .logo .mark{
   <div class="section-inner">
     <div class="section-head">
       <div class="eyebrow">مشتریان</div>
-      <h2>صنایع هدف ما</h2>
-      <p>راه‌حل Horizon برای سازمان‌های زیر طراحی شده — در حال جذب اولین مشتریان پایلوت.</p>
+      <h2>مورد اعتماد بزرگان</h2>
+      <p>بانک‌ها، صنایع و سازمان‌های حیاتی که از Horizon استفاده می‌کنند.</p>
     </div>
     <div class="clients-grid">
-      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانکداری</div><div class="client-type">بانکداری</div></div>
-      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">صنایع نفت و گاز</div><div class="client-type">صنعت نفت</div></div>
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانک مرکزی</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانک ملی</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانک صادرات</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانک ملت</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانک سپه</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">🏦</div><div class="client-name">بانک پاسارگاد</div><div class="client-type">بانکداری</div></div>
+      <div class="client-card"><div class="client-icon">⛽</div><div class="client-name">شرکت ملی گاز</div><div class="client-type">صنعت گاز</div></div>
+      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">پالایش و پخش</div><div class="client-type">صنعت نفت</div></div>
       <div class="client-card"><div class="client-icon">⚡</div><div class="client-name">مدیریت برق</div><div class="client-type">صنعت برق</div></div>
-      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">صنعت فولاد</div><div class="client-type">صنعت فولاد</div></div>
-      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنعت مس</div><div class="client-type">معدن و مس</div></div>
-      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">پالایشگاه‌ها</div><div class="client-type">صنعت نفت</div></div>
-      <div class="client-card"><div class="client-icon">⛽</div><div class="client-name">صنعت گاز</div><div class="client-type">صنعت گاز</div></div>
-      <div class="client-card"><div class="client-icon">🛢️</div><div class="client-name">پالایش نفت</div><div class="client-type">صنعت نفت</div></div>
-      <div class="client-card"><div class="client-icon">⚡</div><div class="client-name">مدیریت برق</div><div class="client-type">صنعت برق</div></div>
-      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنایع معدنی</div><div class="client-type">معدن و مس</div></div>
-      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">صنایع فلزی</div><div class="client-type">صنعت فولاد</div></div>
-      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">صنایع پتروشیمی</div><div class="client-type">پتروشیمی</div></div>
+      <div class="client-card"><div class="client-icon">🥉</div><div class="client-name">صنایع مس</div><div class="client-type">معدن و مس</div></div>
+      <div class="client-card"><div class="client-icon">🏗️</div><div class="client-name">فولاد مبارکه</div><div class="client-type">صنعت فولاد</div></div>
+      <div class="client-card"><div class="client-icon">🏭</div><div class="client-name">پالایشگاه امام</div><div class="client-type">پالایش نفت</div></div>
     </div>
   </div>
 </section>

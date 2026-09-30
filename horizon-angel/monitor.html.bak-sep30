@@ -187,7 +187,7 @@
   <div class="stat">AGENTS <b>144</b></div>
   <div class="stat warn">ALERTS <b id="alert-count">3</b></div>
   <div class="stat danger">THREATS <b id="threat-count">1</b></div>
-  <div class="stat">TPS <b id="tps">35,938</b></div>
+  <div class="stat">TPS <b id="tps">31,113</b></div>
   <div class="clock" id="clock">--:--:--</div>
 </div>
 
@@ -258,7 +258,7 @@
 <div id="offline-panel">
   <button class="close" id="offline-close">× بستن</button>
   <h2>◆ OFFLINE LICENSE — USB + ECDSA</h2>
-  <label>سازمان هدف (نمونه)</label>
+  <label>نام مشتری / بانک / صنعت</label>
   <input id="lic-customer" placeholder="Bank Melli — شعبه مرکزی">
   <label>شناسه لایسنس</label>
   <input id="lic-id" placeholder="HZ-2026-XXXX">
@@ -476,7 +476,7 @@ function demoReply(t) {
     ['سیمان', 'صنعت سیمان: 24 سایت. 2 هشدار ترافیک غیرعادی.'],
     ['threat','تهدید فعال: port scan روی شعبه بانک ملی. تیم red-team در حال بررسی.'],
     ['scan',  'اسکن کامل آغاز شد... 18 صنعت، 16 بانک، 12000+ شعبه، 4800 سنسور.'],
-    ['status','همه سرویس‌ها فعال. TPS: 35,938. آپ‌تایم 99.98%. 144 ایجنت آنلاین.'],
+    ['status','همه سرویس‌ها فعال. TPS: 31,113. آپ‌تایم 99.98%. 144 ایجنت آنلاین.'],
     ['agent', '144 ایجنت آنلاین. 37 در حال کار، 12 idle، بقیه آماده.'],
     ['help',  'فرمان‌ها: بانک | نفت | مس | سیمان | scan | threat | status | agent'],
   ];

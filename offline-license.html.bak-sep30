@@ -49,21 +49,21 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#4f9eff}
 <label>شناسه لایسنس (License ID)</label>
 <input type="text" id="licId" value="HORIZON-GOLD-001">
 
-<label>سازمان هدف (نمونه)</label>
+<label>شناسه کاربر / مشتری</label>
 <select id="userId">
-<option value="bank-markazi">نمونه سازمان A — بانکداری</option>
-<option value="bank-melli">نمونه سازمان B — بانکداری</option>
-<option value="bank-saderat">نمونه سازمان C — بانکداری</option>
-<option value="bank-mellat">نمونه سازمان D — بانکداری</option>
-<option value="bank-sepeh">نمونه سازمان E — بانکداری</option>
-<option value="nioc">نمونه صنعتی F — نفت</option>
-<option value="nigc">نمونه صنعتی G — گاز</option>
-<option value="tavanir">نمونه صنعتی H — برق</option>
-<option value="msc">نمونه صنعتی I — فولاد</option>
-<option value="nicico">نمونه صنعتی J — مس</option>
+<option value="bank-markazi">بانک مرکزی ایران</option>
+<option value="bank-melli">بانک ملی ایران</option>
+<option value="bank-saderat">بانک صادرات ایران</option>
+<option value="bank-mellat">بانک ملت</option>
+<option value="bank-sepeh">بانک سپه</option>
+<option value="nioc">شرکت ملی نفت ایران</option>
+<option value="nigc">شرکت ملی گاز ایران</option>
+<option value="tavanir">مدیریت شبکه برق</option>
+<option value="msc">فولاد مبارکه</option>
+<option value="nicico">صنایع مس ایران</option>
 <option value="custom">دستی وارد کن...</option>
 </select>
-<input type="text" id="customUser" placeholder="نام سازمان (دستی)" style="display:none;margin-top:8px">
+<input type="text" id="customUser" placeholder="نام مشتری دستی" style="display:none;margin-top:8px">
 
 <label>شناسه محصول</label>
 <input type="text" id="productId" value="horizon-core">
