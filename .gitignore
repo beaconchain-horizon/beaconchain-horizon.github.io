@@ -12,3 +12,6 @@ test-keys/
 *.db-shm
 *.db-wal
 customers.json
+*.bak-*
+*.bak
+*.bak2.*
