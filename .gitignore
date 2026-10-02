@@ -1,2 +1,14 @@
 config.local.js
 beaconchain-horizon.github.io/horizon-angel/config.local.js
+test-keys/
+**/test-keys/
+*.pem
+**/*.pem
+*.local.js
+.env
+.env.*
+*.key
+*.db
+*.db-shm
+*.db-wal
+customers.json

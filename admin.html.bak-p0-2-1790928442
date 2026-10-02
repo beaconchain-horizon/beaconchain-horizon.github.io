@@ -52,7 +52,6 @@
 <script src="clients.js"></script>
 </head>
 <body>
-<!-- P0.2-SECURITY-NOTICE: Private keys are NEVER stored in browser storage (localStorage/sessionStorage). Session keys must be entered manually for each signing operation. See SECURITY.md -->
 <script>
 // ═══════════════════════════════════════════════════════
 //  Horizon — Multi-source API with static fallback
@@ -308,7 +307,7 @@ function doLogin(){
 
     // Always save pk if provided
     if(pk && pk.length>10){
-        /* P0.2 SECURITY: private key is NOT persisted — see https://github.com/beaconchain-horizon/horizon-core/SECURITY.md */;
+        localStorage.setItem('hz_private_key', pk);
         console.log('[HZ] private key saved');
     }
 
@@ -335,7 +334,7 @@ function doLogin(){
         }).then(r=>{
             if(r.ok){
                 // Save private key + session permanently
-                /* P0.2 SECURITY: private key is NOT persisted — see https://github.com/beaconchain-horizon/horizon-core/SECURITY.md */;
+                localStorage.setItem('hz_private_key', pk);
                 localStorage.setItem('hz_admin_session', JSON.stringify({
                     method:'private_key',
                     public_address:PUBLIC_ADDR,
@@ -350,7 +349,7 @@ function doLogin(){
         }).catch(e=>{
             // If backend fails, still allow if key format valid
             if(pk.startsWith('0x') && pk.length>=64){
-                /* P0.2 SECURITY: private key is NOT persisted — see https://github.com/beaconchain-horizon/horizon-core/SECURITY.md */;
+                localStorage.setItem('hz_private_key', pk);
                 localStorage.setItem('hz_admin_session', JSON.stringify({
                     method:'private_key_offline',
                     public_address:PUBLIC_ADDR,
@@ -513,7 +512,7 @@ function offDownload() {
 function logout(){
     if(confirm('از پنل خارج می‌شوید؟ (کلید شما ذخیره خواهد ماند)')){
         localStorage.removeItem('hz_admin_session');
-        // P0.2: key never stored
+        // Don't remove private key!
         location.reload();
     }
 }
@@ -521,7 +520,7 @@ function logout(){
 // ============ GENERATE LICENSE ============
 async function genLic(){
     // Get private key from storage (saved on login)
-    const pk=null /* P0.2: never load from storage */ || document.getElementById('pk').value.trim() || '';
+    const pk=localStorage.getItem('hz_private_key') || document.getElementById('pk').value.trim() || '';
     const pid=document.getElementById('pid').value.trim();
     const uid=document.getElementById('uid').value;
     const vol=parseInt(document.getElementById('vol').value);
@@ -728,7 +727,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         } catch(e){}
     }
     // If private key exists but no session, auto-create session
-    const pk=null /* P0.2: never load from storage */;
+    const pk=localStorage.getItem('hz_private_key');
     if(pk){
         localStorage.setItem('hz_admin_session',JSON.stringify({
             method:'auto',
